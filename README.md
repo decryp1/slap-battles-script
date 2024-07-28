@@ -14,3 +14,8 @@ so it's a little random, the way they set it up. so i kinda need to spend an hou
 
 
 (made with love, with ChatGPT)
+
+
+
+
+my youtube to find more of my scripts:  https://www.youtube.com/channel/UCe67Xc9983ramu7ynNUgJGQ
