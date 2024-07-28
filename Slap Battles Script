@@ -1,0 +1,106 @@
+-- Importing necessary Roblox services
+local Players = game:GetService("Players") -- Accessing the Players service
+local ReplicatedStorage = game:GetService("ReplicatedStorage") -- Accessing the ReplicatedStorage service
+local RunService = game:GetService("RunService") -- Accessing the RunService for frame-based updates
+
+-- Local player and settings
+local player = Players.LocalPlayer -- Reference to the local player
+local slapDistance = 50 -- Default maximum distance for slapping other players
+local slapCooldown = 0.5 -- Cooldown time between slaps in seconds
+local lastSlapTime = 0 -- Timestamp of the last slap action
+local slapEnabled = false -- Flag to enable or disable slap aura
+local slappleFarmEnabled = false -- Flag to enable or disable slapple farming
+
+-- Kavo UI Library setup
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))() -- Loading Kavo UI Library
+local Window = Library.CreateLib("Slap Battles Script by d3cryptt!", "Ocean") -- Creating a UI window with the title and theme
+
+-- Slap Aura Section
+local SlapAuraTab = Window:NewTab("Slap Aura") -- Creating a new tab in the UI for Slap Aura
+local SlapAuraSection = SlapAuraTab:NewSection("Slap Aura") -- Creating a new section under the Slap Aura tab
+
+-- Function to slap the closest player within the slap distance
+local function slapClosestPlayer()
+    local closestPlayer = nil -- Variable to hold the closest player
+    local closestDistance = slapDistance -- Initial closest distance set to maximum slap distance
+
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local playerPosition = player.Character.HumanoidRootPart.Position -- Getting the local player's position
+
+        for _, otherPlayer in pairs(Players:GetPlayers()) do
+            if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local otherPlayerPosition = otherPlayer.Character.HumanoidRootPart.Position -- Getting the other player's position
+                local distance = (playerPosition - otherPlayerPosition).Magnitude -- Calculating the distance to the other player
+
+                if distance <= closestDistance then
+                    closestDistance = distance -- Updating the closest distance
+                    closestPlayer = otherPlayer -- Updating the closest player
+                end
+            end
+        end
+
+        if closestPlayer and tick() - lastSlapTime >= slapCooldown then
+            lastSlapTime = tick() -- Updating the last slap time
+            if closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
+                local head = closestPlayer.Character.Head -- Getting the head part of the closest player
+                local args = {head} -- Preparing the argument for the slap event
+                ReplicatedStorage:WaitForChild("SlappleHit"):FireServer(unpack(args)) -- Firing the slap event to the server
+            end
+        end
+    end
+end
+
+-- Function to fire TouchInterests for Slapples
+local function farmSlapples()
+    local slappleContainer = workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples") -- Finding the Slapple container
+    if slappleContainer then
+        for _, slapple in ipairs(slappleContainer:GetChildren()) do
+            if slapple:IsA("Model") and slapple:FindFirstChild("Glove") then
+                local glove = slapple.Glove -- Getting the Glove part of the Slapple
+                if glove:FindFirstChild("TouchInterest") then
+                    firetouchinterest(player.Character.HumanoidRootPart, glove, 0) -- Triggering the TouchInterest on the Glove
+                    firetouchinterest(player.Character.HumanoidRootPart, glove, 1) -- Stopping the trigger
+                end
+            end
+        end
+    end
+end
+
+-- Function to update slap and slapple farm checks
+local function onUpdate()
+    if slapEnabled then
+        slapClosestPlayer() -- Call the slap function if Slap Aura is enabled
+    end
+    if slappleFarmEnabled then
+        farmSlapples() -- Call the farm function if Slapple Farm is enabled
+    end
+end
+
+-- UI Elements for Slap Aura
+SlapAuraSection:NewToggle("Enable Slap Aura", "Toggle the Slap Aura on/off", function(state)
+    slapEnabled = state -- Update the slapEnabled flag based on the toggle state
+end)
+
+SlapAuraSection:NewSlider("Slap Distance", "Set the distance for the Slap Aura", 50, 1, slapDistance, function(value)
+    slapDistance = value -- Update the slapDistance based on the slider value
+end)
+
+-- Slapple Farm Section
+local SlappleFarmSection = SlapAuraTab:NewSection("Slapple Farm") -- Creating a new section under the Slap Aura tab for Slapple Farm
+SlappleFarmSection:NewToggle("Enable Slapple Farm", "Toggle the Slapple Farm on/off", function(state)
+    slappleFarmEnabled = state -- Update the slappleFarmEnabled flag based on the toggle state
+end)
+
+-- Continuous check for actions
+RunService.RenderStepped:Connect(onUpdate) -- Connecting the onUpdate function to the RenderStepped event for continuous updates
+
+-- Extra Stuff Section
+local extrashitTab = Window:NewTab("extra stuff") -- Creating a new tab in the UI for extra stuff
+local extrashitSection = extrashitTab:NewSection("some cool useful stuff") -- Creating a new section under the extra stuff tab
+
+extrashitSection:NewButton("Infinite Yield", "gives you admin commands", function()
+ loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() -- Button to load Infinite Yield, an admin command script
+end)
+
+-- Initial setup
+Library:Init() -- Initializing the UI Library
