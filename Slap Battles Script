@@ -1,65 +1,205 @@
--- Importing necessary Roblox services
-local Players = game:GetService("Players") -- Accessing the Players service
-local ReplicatedStorage = game:GetService("ReplicatedStorage") -- Accessing the ReplicatedStorage service
-local RunService = game:GetService("RunService") -- Accessing the RunService for frame-based updates
-
--- Local player and settings
-local player = Players.LocalPlayer -- Reference to the local player
-local slapDistance = 50 -- Default maximum distance for slapping other players
-local slapCooldown = 0.5 -- Cooldown time between slaps in seconds
-local lastSlapTime = 0 -- Timestamp of the last slap action
-local slapEnabled = false -- Flag to enable or disable slap aura
-local slappleFarmEnabled = false -- Flag to enable or disable slapple farming
-
+-- made with ChatGPT 4-0, for testing purposes
 -- Kavo UI Library setup
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))() -- Loading Kavo UI Library
-local Window = Library.CreateLib("Slap Battles Script by d3cryptt!", "Ocean") -- Creating a UI window with the title and theme
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("Slap Battles Script by d3cryptt! (Chatgpt made 90%)", "Ocean")
 
 -- Slap Aura Section
-local SlapAuraTab = Window:NewTab("Slap Aura") -- Creating a new tab in the UI for Slap Aura
-local SlapAuraSection = SlapAuraTab:NewSection("Slap Aura") -- Creating a new section under the Slap Aura tab
+local SlapAuraTab = Window:NewTab("Slap Aura")
+local SlapAuraSection = SlapAuraTab:NewSection("Slap Aura")
+
+-- Variables
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+local slapDistance = 50
+local slapCooldown = 0.6
+local lastSlapTime = 0
+local slapEnabled = false
+local selectedRemote = "b" -- Default remote
 
 -- Function to slap the closest player within the slap distance
 local function slapClosestPlayer()
-    local closestPlayer = nil -- Variable to hold the closest player
-    local closestDistance = slapDistance -- Initial closest distance set to maximum slap distance
+    if not slapEnabled then return end -- Only proceed if Slap Aura is enabled
+
+    local closestPlayer = nil
+    local closestDistance = slapDistance
 
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local playerPosition = player.Character.HumanoidRootPart.Position -- Getting the local player's position
+        local playerPosition = player.Character.HumanoidRootPart.Position
 
         for _, otherPlayer in pairs(Players:GetPlayers()) do
             if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                local otherPlayerPosition = otherPlayer.Character.HumanoidRootPart.Position -- Getting the other player's position
-                local distance = (playerPosition - otherPlayerPosition).Magnitude -- Calculating the distance to the other player
+                local otherPlayerPosition = otherPlayer.Character.HumanoidRootPart.Position
+                local distance = (playerPosition - otherPlayerPosition).Magnitude
 
                 if distance <= closestDistance then
-                    closestDistance = distance -- Updating the closest distance
-                    closestPlayer = otherPlayer -- Updating the closest player
+                    closestDistance = distance
+                    closestPlayer = otherPlayer
                 end
             end
         end
 
         if closestPlayer and tick() - lastSlapTime >= slapCooldown then
-            lastSlapTime = tick() -- Updating the last slap time
+            lastSlapTime = tick() -- Update last slap time
             if closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
-                local head = closestPlayer.Character.Head -- Getting the head part of the closest player
-                local args = {head} -- Preparing the argument for the slap event
-                ReplicatedStorage:WaitForChild("SlappleHit"):FireServer(unpack(args)) -- Firing the slap event to the server
+                local head = closestPlayer.Character.Head
+                local args = {head}
+                local remote = ReplicatedStorage:FindFirstChild(selectedRemote)
+                if remote then
+                    remote:FireServer(unpack(args))
+                end
             end
         end
     end
 end
 
+-- Dropdown menu for glove selection
+local gloveList = {
+    {"default", "b"},
+    {"dual", "GeneralHit"},
+    {"diamond", "DiamondHit"},
+    {"ZZZZZZZ", "ZZZZZZZHit"},
+    {"Extended", "b"},
+    {"brick", "BrickHit"},
+    {"snow", "SnowHit"},
+    {"pull", "PullHit"},
+    {"flash", "FlashHit"},
+    {"spring", "springhit"},
+    {"swapper", "HitSwapper"},
+    {"bull", "BullHit"},
+    {"dice", "DiceHit"},
+    {"ghost", "GhostHit"},
+    {"thanos", "ThanosHit"},
+    {"stun", "HtStun"},
+    {"L.O.L.B.O.M.B", "GeneralHit"},
+    {"za hando", "zhrmat"},
+    {"fort", "Fort"},
+    {"magnet", "MagnetHIT"},
+    {"pusher", "PusherHit"},
+    {"anchor", "hitAnchor"},
+    {"space", "HtSpace"},
+    {"boomerang", "BoomerangH"},
+    {"speedrun", "Speedrunhit"},
+    {"mail", "MailHit"},
+    {"T H I C K", "GeneralHit"},
+    {"golden", "GoldenHit"},
+    {"squid", "GeneralHit"},
+    {"MR", "MisterHit"},
+    {"hive", "GeneralHit"},
+    {"reaper", "GeneralHit"},
+    {"replica", "ReplicaHit"},
+    {"defense", "DefenseHit"},
+    {"killstreak", "KSHit"},
+    {"reverse", "ReverseHit"},
+    {"shukuchi", "ShukuchiHit"},
+    {"duelist", "DuelistHit"},
+    {"woah", "(NOT SUPPORTED)"},
+    {"ice", "(NOT SUPPORTED)"},
+    {"gummy", "(NOT SUPPORTED)"},
+    {"adios", "(NOT SUPPORTED)"},
+    {"blocked", "(NOT SUPPORTED)"},
+    {"divert", "(NOT SUPPORTED)"},
+    {"engineer", "(NOT SUPPORTED)"},
+    {"rocky", "(NOT SUPPORTED)"},
+    {"coil", "(NOT SUPPORTED)"},
+    {"conveyor", "(NOT SUPPORTED)"},
+    {"balloony", "(NOT SUPPORTED)"},
+    {"phantom", "(NOT SUPPORTED)"},
+    {"el gato", "(NOT SUPPORTED)"},
+    {"wormhole", "(NOT SUPPORTED)"},
+    {"stop", "(NOT SUPPORTED)"},
+    {"track", "(NOT SUPPORTED)"},
+    {"tableflip", "(NOT SUPPORTED)"},
+    {"shild", "(NOT SUPPORTED)"},
+    {"booster", "(NOT SUPPORTED)"},
+    {"ping pong", "(NOT SUPPORTED)"},
+    {"baller", "(NOT SUPPORTED)"},
+    {"home run", "(NOT SUPPORTED)"},
+    {"whirlwind", "(NOT SUPPORTED)"},
+    {"slicer", "(NOT SUPPORTED)"},
+    {"excavator", "(NOT SUPPORTED)"},
+    {"nightmare", "(NOT SUPPORTED)"},
+    {"thor", "(NOT SUPPORTED)"},
+    {"pocket", "(NOT SUPPORTED)"},
+    {"grapple", "(NOT SUPPORTED)"},
+    {"cloud", "(NOT SUPPORTED)"},
+    {"gravity", "(NOT SUPPORTED)"},
+    {"parry", "(NOT SUPPORTED)"},
+    {"jebaited", "(NOT SUPPORTED)"},
+    {"meteor", "(NOT SUPPORTED)"},
+    {"oven", "(NOT SUPPORTED)"},
+    {"guardian angel", "(NOT SUPPORTED)"},
+    {"sun", "(NOT SUPPORTED)"},
+    {"ferryman", "(NOT SUPPORTED)"},
+    {"blackhole", "(NOT SUPPORTED)"},
+    {"blink", "(NOT SUPPORTED)"},
+    {"prop", "(NOT SUPPORTED)"},
+    {"slapstick", "(NOT SUPPORTED)"},
+    {"beatdown", "(NOT SUPPORTED)"},
+    {"chicken", "(NOT SUPPORTED)"},
+    {"bonk", "(NOT SUPPORTED)"},
+    {"sbeve", "(NOT SUPPORTED)"},
+    {"golem", "(NOT SUPPORTED)"},
+    {"grab", "(NOT SUPPORTED)"},
+    {"ufo", "(NOT SUPPORTED)"},
+    {"god's hand", "(NOT SUPPORTED)"},
+    {"the flex", "FlexHit"}
+}
+
+local gloveNames = {}
+for _, glove in ipairs(gloveList) do
+    table.insert(gloveNames, glove[1])
+end
+
+SlapAuraSection:NewDropdown("Select Glove", "Choose a glove to set the remote", gloveNames, function(selected)
+    for _, glove in ipairs(gloveList) do
+        if glove[1] == selected then
+            selectedRemote = glove[2]
+            break
+        end
+    end
+end)
+
+-- UI Elements for Slap Aura
+SlapAuraSection:NewToggle("Enable Slap Aura", "Toggle the Slap Aura on/off", function(state)
+    slapEnabled = state
+end)
+
+SlapAuraSection:NewSlider("Slap Distance", "Set the distance for the Slap Aura", 50, 1, slapDistance, function(value)
+    slapDistance = value
+end)
+
+-- Update handling using RunService
+local RunService = game:GetService("RunService")
+
+RunService.RenderStepped:Connect(function()
+    if slapEnabled then
+        slapClosestPlayer()
+    end
+end)
+
+--Slapple stuff
+local SlappleFarmTab = Window:NewTab("Slapple Farm")
+local SlappleFarmSection = SlappleFarmTab:NewSection("farm slapples")
+
+
+-- Slapple Farm Section
+
+SlappleFarmSection:NewToggle("Enable Slapple Farm", "Toggle the Slapple Farm on/off", function(state)
+    slappleFarmEnabled = state
+end)
+
+
 -- Function to fire TouchInterests for Slapples
 local function farmSlapples()
-    local slappleContainer = workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples") -- Finding the Slapple container
+    local slappleContainer = workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples")
     if slappleContainer then
         for _, slapple in ipairs(slappleContainer:GetChildren()) do
             if slapple:IsA("Model") and slapple:FindFirstChild("Glove") then
-                local glove = slapple.Glove -- Getting the Glove part of the Slapple
+                local glove = slapple.Glove
                 if glove:FindFirstChild("TouchInterest") then
-                    firetouchinterest(player.Character.HumanoidRootPart, glove, 0) -- Triggering the TouchInterest on the Glove
-                    firetouchinterest(player.Character.HumanoidRootPart, glove, 1) -- Stopping the trigger
+                    firetouchinterest(player.Character.HumanoidRootPart, glove, 0)
+                    firetouchinterest(player.Character.HumanoidRootPart, glove, 1)
                 end
             end
         end
@@ -69,38 +209,97 @@ end
 -- Function to update slap and slapple farm checks
 local function onUpdate()
     if slapEnabled then
-        slapClosestPlayer() -- Call the slap function if Slap Aura is enabled
+        slapClosestPlayer()
     end
     if slappleFarmEnabled then
-        farmSlapples() -- Call the farm function if Slapple Farm is enabled
+        farmSlapples()
     end
 end
 
--- UI Elements for Slap Aura
-SlapAuraSection:NewToggle("Enable Slap Aura", "Toggle the Slap Aura on/off", function(state)
-    slapEnabled = state -- Update the slapEnabled flag based on the toggle state
-end)
-
-SlapAuraSection:NewSlider("Slap Distance", "Set the distance for the Slap Aura", 50, 1, slapDistance, function(value)
-    slapDistance = value -- Update the slapDistance based on the slider value
-end)
-
--- Slapple Farm Section
-local SlappleFarmSection = SlapAuraTab:NewSection("Slapple Farm") -- Creating a new section under the Slap Aura tab for Slapple Farm
-SlappleFarmSection:NewToggle("Enable Slapple Farm", "Toggle the Slapple Farm on/off", function(state)
-    slappleFarmEnabled = state -- Update the slappleFarmEnabled flag based on the toggle state
-end)
 
 -- Continuous check for actions
-RunService.RenderStepped:Connect(onUpdate) -- Connecting the onUpdate function to the RenderStepped event for continuous updates
+RunService.RenderStepped:Connect(onUpdate)
 
--- Extra Stuff Section
-local extrashitTab = Window:NewTab("extra stuff") -- Creating a new tab in the UI for extra stuff
-local extrashitSection = extrashitTab:NewSection("some cool useful stuff") -- Creating a new section under the extra stuff tab
+-- Anti Fall Tab and Toggle
+local AntiFallTab = Window:NewTab("Anti Fall")
+local AntiFallSection = AntiFallTab:NewSection("Anti Fall")
 
-extrashitSection:NewButton("Infinite Yield", "gives you admin commands", function()
- loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))() -- Button to load Infinite Yield, an admin command script
+-- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+-- Variables
+local player = Players.LocalPlayer
+local teleportCFrame = CFrame.new(-6.73902416, -5.20054817, 1.95076489, -0.136649311, -0.00766478525, -0.990589857, -0.000125628911, 0.999970198, -0.00772003829, 0.99061954, -0.000930505106, -0.136646196)
+local fallProtectionEnabled = false
+
+-- Function to check if the player has fallen
+local function checkFall()
+    if fallProtectionEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local yPosition = player.Character.HumanoidRootPart.Position.Y
+        if yPosition < -10 then -- Set the threshold Y value as needed
+            player.Character:SetPrimaryPartCFrame(teleportCFrame)
+        end
+    end
+end
+
+AntiFallSection:NewToggle("Enable Anti Fall", "Toggle the Anti Fall protection on/off", function(state)
+    fallProtectionEnabled = state
 end)
 
--- Initial setup
-Library:Init() -- Initializing the UI Library
+-- Continuous check for fall detection
+RunService.Heartbeat:Connect(checkFall)
+
+-- Other tabs and sections you have can go below here...
+
+
+local extrashitTab = Window:NewTab("extra stuff")
+local extrashitSection = extrashitTab:NewSection("some cool useful stuff")
+
+-- Function to fire ClickDetector
+local function firePlayerClickDetector()
+    if not autoclickEnabled then return end
+    
+    -- Iterate over all objects in workspace
+    for _, object in pairs(workspace:GetChildren()) do
+        -- Check if the object's name contains the player's name and "Tycoon"
+        if object:IsA("Model") and object.Name:find(playerName) and object.Name:find("Tycoon") then
+            -- Find the "Click" part and the ClickDetector inside it
+            local clickPart = object:FindFirstChild("Click")
+            if clickPart and clickPart:FindFirstChild("ClickDetector") then
+                local clickDetector = clickPart.ClickDetector
+                fireclickdetector(clickDetector)
+            end
+        end
+    end
+end
+
+-- Toggle button for Auto Click
+extrashitSection:NewToggle("Enable Auto Click", "Toggle the auto clicker on/off", function(state)
+    autoclickEnabled = state
+end)
+
+-- Continuous check for autoclicking
+RunService.Heartbeat:Connect(function()
+    firePlayerClickDetector()
+    wait(0.1)
+end)
+
+
+extrashitSection:NewButton("Infinite Yield", "gives you admin commands", function()
+ loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+
+
+extrashitSection:NewButton("Remote Spy", "gives you a remote spyer", function()
+ loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
+end)
+
+extrashitSection:NewButton("Dex Explorer", "gives you dex explorer", function()
+ loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+end)
+
+
+Library:Init()
+
+
