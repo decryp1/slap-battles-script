@@ -1,6 +1,6 @@
 # ChatGPT-4-0-Slap-Battles-script
 actually new slap battles script.
-works amazingly, features include Slap Aura, Anti fall, Slapple Farm, Custom aura range, and you can choose out of any glove for a slapaura.
+works amazingly, features include Slap Aura, God Mode, Anti fall (2 modes), Slapple Farm, Custom aura range, and you can choose out of any glove for a slapaura.
 really just a funny little script i felt like making, passing the time while wave gets their stuff together.
 
 
