@@ -180,7 +180,7 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-SlapAuraSection:NewButton("Teleport To Arena, (99% God Mode", "Makes you tp to the Arena", function()
+SlapAuraSection:NewButton("Teleport To Arena, (99% God Mode)", "Makes you tp to the Arena", function()
         local player = game.Players.LocalPlayer.Character
 local part = workspace.Arena["main island"].Grass 
 player.HumanoidRootPart.CFrame = part.CFrame
@@ -326,7 +326,7 @@ local function firePlayerClickDetector()
 end
 
 -- Toggle button for Auto Click
-extrashitSection:NewToggle("Enable Auto Click", "Toggle the auto clicker on/off", function(state)
+extrashitSection:NewToggle("Tycoon Autoclick (also doesnt work)", "Toggle the auto clicker on/off", function(state)
     autoclickEnabled = state
 end)
 
