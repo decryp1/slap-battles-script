@@ -7,12 +7,12 @@ local Window = Library.CreateLib("Slap Battles Script by d3cryptt! (Chatgpt made
 -- Slap Aura Section
 local SlapAuraTab = Window:NewTab("Slap Aura")
 local SlapAuraSection = SlapAuraTab:NewSection("Slap Aura")
-local SlapAuraSection = SlapAuraTab:NewSection("alt got banned, add remotes yourself for more gloves")
+local SlapAuraSection = SlapAuraTab:NewSection("alt got banned, Add remotes yourself for more gloves")
 -- Variables
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
-local slapDistance = 50
+local slapDistance = 60
 local slapCooldown = 0.6
 local lastSlapTime = 0
 local slapEnabled = false
@@ -56,7 +56,7 @@ end
 
 -- Dropdown menu for glove selection
 local gloveList = {
-    {"Default", "b"},
+    {"Default", "Slap"},
     {"Dual", "GeneralHit"},
     {"Diamond", "DiamondHit"},
     {"ZZZZZZZ", "ZZZZZZZHit"},
@@ -171,6 +171,12 @@ SlapAuraSection:NewSlider("Slap Distance", "Set the distance for the Slap Aura",
     slapDistance = value
 end)
 
+SlapAuraSection:NewButton("Tp to Arena, (god mode) (USE IN THE LOBBY!!)", "Makes you tp to the Arena", function()
+        local player = game.Players.LocalPlayer.Character
+local part = workspace.Arena["main island"].Grass 
+player.HumanoidRootPart.CFrame = part.CFrame
+    end)
+
 -- Update handling using RunService
 local RunService = game:GetService("RunService")
 
@@ -179,12 +185,6 @@ RunService.RenderStepped:Connect(function()
         slapClosestPlayer()
     end
 end)
-
-SlapAuraSection:NewButton("Teleport To Arena, (99% God Mode)", "Makes you tp to the Arena", function()
-        local player = game.Players.LocalPlayer.Character
-local part = workspace.Arena["main island"].Grass 
-player.HumanoidRootPart.CFrame = part.CFrame
-    end)
 
 --Slapple stuff
 local SlappleFarmTab = Window:NewTab("Slapple Farm")
@@ -301,39 +301,102 @@ AntiFallSection:NewToggle("Invisible Floor Anti Fall", "Toggle the invisible pla
 end)
 
 
+
 -- Other tabs and sections you have can go below here...
+
+local PlayerTab = Window:NewTab("Player")
+local PlayerSection = PlayerTab:NewSection("Player")
+local PlayerSection = PlayerTab:NewSection("funny stuff that is funny")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Connections storage
+local HumanModCons = {}
+
+-- Function to handle WalkSpeed change
+local function WalkSpeedChange(speed)
+    humanoid.WalkSpeed = speed
+end
+
+-- Function to handle JumpPower change
+local function JumpPowerChange(power)
+    humanoid.JumpPower = power
+end
+
+-- Slider for WalkSpeed
+PlayerSection:NewSlider("Walk Speed", "Adjusts your walk speed", 150, 16, function(value)
+    local speed = value
+    if isnumber(speed) then
+        WalkSpeedChange(speed)
+        HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+            WalkSpeedChange(speed)
+        end)
+        HumanModCons.wsCA = (HumanModCons.wsCA and HumanModCons.wsCA:Disconnect() and false) or player.CharacterAdded:Connect(function(nChar)
+            character, humanoid = nChar, nChar:WaitForChild("Humanoid")
+            WalkSpeedChange(speed)
+            HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+                WalkSpeedChange(speed)
+            end)
+        end)
+    end
+end)
+
+-- Slider for JumpPower
+PlayerSection:NewSlider("Jump Power", "Adjusts your jump power", 150, 50, function(value)
+    local power = value
+    if isnumber(power) then
+        JumpPowerChange(power)
+        HumanModCons.jpLoop = (HumanModCons.jpLoop and HumanModCons.jpLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("JumpPower"):Connect(function()
+            JumpPowerChange(power)
+        end)
+        HumanModCons.jpCA = (HumanModCons.jpCA and HumanModCons.jpCA:Disconnect() and false) or player.CharacterAdded:Connect(function(nChar)
+            character, humanoid = nChar, nChar:WaitForChild("Humanoid")
+            JumpPowerChange(power)
+            HumanModCons.jpLoop = (HumanModCons.jpLoop and HumanModCons.jpLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("JumpPower"):Connect(function()
+                JumpPowerChange(power)
+            end)
+        end)
+    end
+end)
+
+-- Cleanup function when the player leaves
+Players.PlayerRemoving:Connect(function(removingPlayer)
+    if removingPlayer == player then
+        if HumanModCons.wsLoop then HumanModCons.wsLoop:Disconnect() end
+        if HumanModCons.wsCA then HumanModCons.wsCA:Disconnect() end
+        if HumanModCons.jpLoop then HumanModCons.jpLoop:Disconnect() end
+        if HumanModCons.jpCA then HumanModCons.jpCA:Disconnect() end
+    end
+end)
+
+-- Function to check if a value is a number
+function isnumber(value)
+    return type(value) == "number"
+end
 
 
 local extrashitTab = Window:NewTab("extra stuff")
 local extrashitSection = extrashitTab:NewSection("some cool useful stuff")
 
--- Function to fire ClickDetector
-local function firePlayerClickDetector()
-    if not autoclickEnabled then return end
-    
-    -- Iterate over all objects in workspace
-    for _, object in pairs(workspace:GetChildren()) do
-        -- Check if the object's name contains the player's name and "Tycoon"
-        if object:IsA("Model") and object.Name:find(playerName) and object.Name:find("Tycoon") then
-            -- Find the "Click" part and the ClickDetector inside it
-            local clickPart = object:FindFirstChild("Click")
-            if clickPart and clickPart:FindFirstChild("ClickDetector") then
-                local clickDetector = clickPart.ClickDetector
-                fireclickdetector(clickDetector)
-            end
+extrashitSection:NewToggle("Auto Click Tycoon", "Automatically clicks the Tycoon button", function(Value)
+    AutoTycoon = Value
+    for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "End" and v.ClassName == "Part" then
+            v.Size = Vector3.new(28, 0.3, 4)
         end
     end
-end
-
--- Toggle button for Auto Click
-extrashitSection:NewToggle("Tycoon Autoclick (also doesnt work)", "Toggle the auto clicker on/off", function(state)
-    autoclickEnabled = state
-end)
-
--- Continuous check for autoclicking
-RunService.Heartbeat:Connect(function()
-    firePlayerClickDetector()
-    wait(0.1)
+    while AutoTycoon do
+        for i,v in pairs(workspace:GetDescendants()) do
+            if v.Name == "Click" and v:FindFirstChild("ClickDetector") then
+                fireclickdetector(v.ClickDetector)
+            end
+        end
+        task.wait()
+    end
 end)
 
 
@@ -350,81 +413,121 @@ extrashitSection:NewButton("Dex Explorer", "gives you dex explorer", function()
  loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
 end)
 
-local Autofarm = Window:NewTab("Autofarm (ass)")
-local AutofarmSection = Autofarm:NewSection("Track Under Random Player")
+local BadgesTab = Window:NewTab("Badges")
+local BadgesSection = BadgesTab:NewSection("Badges")
 
--- Variables
-local TweenService = game:GetService("TweenService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local isToggling = false
-local maxDistance = 300 -- Maximum distance in studs
-local tweenSpeed = 10 -- Default tween speed
-
--- Function to find a random player within a specified distance
-local function findPlayerWithinDistance()
-    local nearbyPlayers = {}
-    local localPosition = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character.HumanoidRootPart.Position
-
-    if localPosition then
-        for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local playerPosition = player.Character.HumanoidRootPart.Position
-                local distance = (localPosition - playerPosition).magnitude
-
-                if distance <= maxDistance then
-                    table.insert(nearbyPlayers, player)
-                end
+BadgesSection:NewButton("Get Elude", "Teleport to Elude Maze", function()
+    local teleportFunc = queueonteleport or queue_on_teleport
+    if teleportFunc then
+        teleportFunc([[
+            if not game:IsLoaded() then
+                game.Loaded:Wait()
             end
-        end
+            repeat wait() until game.Players.LocalPlayer
+            game:GetService("RunService").RenderStepped:Connect(function()
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-502.336, 14.228, -179.597)
+            end)
+            game:GetService("TeleportService"):Teleport(6403373529)
+        ]])
     end
-
-    if #nearbyPlayers > 0 then
-        return nearbyPlayers[math.random(1, #nearbyPlayers)]
-    end
-end
-
--- Function to keep the local player's character underneath a random player within distance
-local function trackRandomPlayer()
-    while isToggling do
-        local player = findPlayerWithinDistance()
-        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local rootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            local targetRootPart = player.Character.HumanoidRootPart
-
-            while isToggling and player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and (rootPart.Position - targetRootPart.Position).magnitude <= maxDistance do
-                local targetPosition = targetRootPart.Position - Vector3.new(0, 6, 0) -- Adjust as needed
-                local tweenInfo = TweenInfo.new(tweenSpeed, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-                local goal = { Position = targetPosition }
-
-                local tween = TweenService:Create(rootPart, tweenInfo, goal)
-                tween:Play()
-                tween.Completed:Wait()
-
-                wait(tweenSpeed)
-            end
-        else
-            wait(0.5)
-        end
-    end
-end
-
--- Toggle function for the button
-local function toggleFunction()
-    if isToggling then
-        isToggling = false
-    else
-        isToggling = true
-        spawn(trackRandomPlayer)
-    end
-end
-
--- Kavo UI Button Setup
-AutofarmSection:NewToggle("Enable Tracking", "Toggle the tracking of your character underneath a random player within 300 studs", function(state)
-    toggleFunction()
+    game:GetService("TeleportService"):Teleport(11828384869)
 end)
 
--- TweenSpeed Slider Setup
-AutofarmSection:NewSlider("Tween Speed", "Adjust the tween speed", 300, 1, function(value)
-    tweenSpeed = value  -- Scale the value down for practical use
+BadgesSection:NewButton("Get Chain (1k slaps)", "Teleport and solve puzzle", function()
+    if game.Players.LocalPlayer.leaderstats.Slaps.Value >= 1000 then
+        local teleportFunc = queueonteleport or queue_on_teleport
+        if teleportFunc then
+            teleportFunc([[
+                if not game:IsLoaded() then
+                    game.Loaded:Wait()
+                end
+                repeat wait() until game.Players.LocalPlayer
+                repeat wait() until game.Workspace:FindFirstChild("Map"):FindFirstChild("CodeBrick")
+                if game.Workspace.Map.CodeBrick.SurfaceGui:FindFirstChild("IMGTemplate") then
+                    game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "1st"
+                    game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "2nd"
+                    game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "3rd"
+                    game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "4th"
+                end
+                -- Your logic for setting first, second, third, and fourth variables
+                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons.Reset.ClickDetector)
+                wait(0.25)
+                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[first].ClickDetector)
+                wait(0.25)
+                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[second].ClickDetector)
+                wait(0.25)
+                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[third].ClickDetector)
+                wait(0.25)
+                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[fourth].ClickDetector)
+                wait(0.25)
+                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons.Enter.ClickDetector)
+                game:GetService("TeleportService"):Teleport(6403373529)
+            ]])
+        end
+        game:GetService("TeleportService"):Teleport(9431156611)
+    end
+end)
+
+BadgesSection:NewButton("Get Tycoon (kinda sucks, fixing soon) ", "Automatically get the Tycoon badge", function()
+    repeat task.wait()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Arena.Plate.CFrame * CFrame.new(0,2,0) * CFrame.Angles(math.rad(90), math.rad(0), math.rad(0))
+    until game.Players.LocalPlayer.PlayerGui.PlateIndicator.TextLabel.Text == "Plate Counter: 600"
+end)
+
+BadgesSection:NewButton("Get [REDACTED] (5k slaps)", "Get the [REDACTED] badge", function()
+    if game.Players.LocalPlayer.leaderstats.Slaps.Value >= 5000 then
+        Door = 0
+        for i = 1, 10 do
+            Door = Door + 1
+            if not game:GetService("BadgeService"):UserHasBadgeAsync(game.Players.LocalPlayer.UserId, 2124847850) then
+                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), workspace.PocketDimension.Doors[Door], 0)
+                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), workspace.PocketDimension.Doors[Door], 1)
+                wait(3.75)
+            end
+        end
+    else
+        print ("you so stupid brah")
+    end
+end)
+
+BadgesSection:NewToggle("Auto Collect Jet Orbs", "Auto-collect Jet Orbs", function(Value)
+    Jetfarm = Value
+    while Jetfarm do
+        for _, v in pairs(game.Workspace:GetChildren()) do
+            if v.Name == "JetOrb" and v:FindFirstChild("TouchInterest") then
+                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 1)
+            end
+        end
+        task.wait()
+    end
+end)
+
+BadgesSection:NewToggle("Auto Collect Phase Orbs", "Auto-collect Phase Orbs", function(Value)
+    Phasefarm = Value
+    while Phasefarm do
+        for _, v in pairs(game.Workspace:GetChildren()) do
+            if v.Name == "PhaseOrb" and v:FindFirstChild("TouchInterest") then
+                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 0)
+                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 1)
+            end
+        end
+        task.wait()
+    end
+end)
+
+BadgesSection:NewButton("Get Brazil Badge", "Get the Brazil badge", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.workspace.Lobby.brazil.portal.CFrame
+end)
+
+BadgesSection:NewButton("Get court evidence Badge", "Get the court evidence badge", function()
+    fireclickdetector(game.Workspace.Lobby.Scene.knofe.ClickDetector)
+end)
+
+BadgesSection:NewButton("Get duck Badge", "Get the duck badge", function()
+    fireclickdetector(game.Workspace.Arena["default island"]["Rubber Ducky"].ClickDetector)
+end)
+
+BadgesSection:NewButton("Get The Lone Orange Badge", "Get The Lone Orange badge", function()
+    fireclickdetector(game.Workspace.Arena.island5.Orange.ClickDetector)
 end)
