@@ -2,12 +2,12 @@
 -- somehow this is better than any other script for this game i've seen so far
 -- Kavo UI Library setup
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("Slap Battles Script by d3cryptt! (Chatgpt made 90%)", "Ocean")
+local Window = Library.CreateLib("Slap Battles Script by d3cryptt! (best sb script ever!)", "Ocean")
 
 -- Slap Aura Section
 local SlapAuraTab = Window:NewTab("Slap Aura")
 local SlapAuraSection = SlapAuraTab:NewSection("Slap Aura")
-local SlapAuraSection = SlapAuraTab:NewSection("alt got banned, Add remotes yourself for more gloves")
+local SlapAuraSection = SlapAuraTab:NewSection("good alt got banned, use my video for a tutorial!")
 -- Variables
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -56,7 +56,7 @@ end
 
 -- Dropdown menu for glove selection
 local gloveList = {
-    {"Default", "Slap"},
+    {"Default", "b"},
     {"Dual", "GeneralHit"},
     {"Diamond", "DiamondHit"},
     {"ZZZZZZZ", "ZZZZZZZHit"},
@@ -145,7 +145,11 @@ local gloveList = {
     {"Ufo", "(NOT SUPPORTED)"},
     {"God's Hand", "(NOT SUPPORTED)"},
     {"The Flex", "FlexHit"},
-    {"CULT", "CULTHit"}
+    {"CULT", "CULTHit"},
+    {"Tycoon", "GeneralHit"},
+    {"Orbit", "Orbihit"},
+    {"Avatar (works for Avatar and the Normal Glove", "GeneralHit"},
+    {"Frostbite", "GeneralHit"}
 }
 
 local gloveNames = {}
@@ -185,6 +189,7 @@ RunService.RenderStepped:Connect(function()
         slapClosestPlayer()
     end
 end)
+
 
 --Slapple stuff
 local SlappleFarmTab = Window:NewTab("Slapple Farm")
@@ -300,6 +305,21 @@ AntiFallSection:NewToggle("Invisible Floor Anti Fall", "Toggle the invisible pla
     togglePlatform()
 end)
 
+AntiFallSection:NewButton("Delete Void/Death Barriers (not lobby)", "Deletes all specified barriers", function()
+    local partsToDelete = {
+        workspace:FindFirstChild("DEATHBARRIER"),
+        workspace:FindFirstChild("DEATHBARRIER2"),
+        workspace:FindFirstChild("ArenaBarrier"),
+        workspace:FindFirstChild("dedBarrier"),
+        workspace:FindFirstChild("AntiDefaultArena")
+    }
+
+    for _, part in ipairs(partsToDelete) do
+        if part then
+            part:Destroy()
+        end
+    end
+end)
 
 
 -- Other tabs and sections you have can go below here...
@@ -400,6 +420,34 @@ extrashitSection:NewToggle("Auto Click Tycoon", "Automatically clicks the Tycoon
 end)
 
 
+extrashitSection:NewButton("Give Reaper 20 kills (press this after they slap you)", "ButtonInfo", function()
+    for i = 1, 20 do
+        game:GetService("ReplicatedStorage"):WaitForChild("HumanoidDied"):FireServer(x, false)
+    end
+    for i, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+        if v.Name == "DeathMark" then
+            game.ReplicatedStorage.ReaperGone:FireServer(v)
+            game:GetService("Lighting"):WaitForChild("DeathMarkColorCorrection"):Destroy()
+        end
+    end
+end)
+
+extrashitSection:NewToggle("Rhythm Explosion Spam (All gloves)", "Toggles the rhythm explosion spam", function(state)
+    RhythmSpam = state
+    while RhythmSpam do
+        game:GetService("ReplicatedStorage").rhythmevent:FireServer("AoeExplosion", 0)
+        task.wait()
+    end
+end)
+
+extrashitSection:NewToggle("Null Ability (all gloves)", "Toggles the Null ability loop", function(state)
+    NullSpam = state
+    while NullSpam do
+        game:GetService("ReplicatedStorage").NullAbility:FireServer()
+        task.wait()
+    end
+end)
+
 extrashitSection:NewButton("Infinite Yield", "gives you admin commands", function()
  loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
 end)
@@ -449,12 +497,12 @@ BadgesSection:NewButton("Get Chain (1k slaps)", "Teleport and solve puzzle", fun
                     game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "3rd"
                     game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "4th"
                 end
-                -- Your logic for setting first, second, third, and fourth variables
+                -- Your logic for setting first, seconds, third, and fourth variables
                 fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons.Reset.ClickDetector)
                 wait(0.25)
                 fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[first].ClickDetector)
                 wait(0.25)
-                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[second].ClickDetector)
+                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[seconds].ClickDetector)
                 wait(0.25)
                 fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[third].ClickDetector)
                 wait(0.25)
@@ -468,10 +516,23 @@ BadgesSection:NewButton("Get Chain (1k slaps)", "Teleport and solve puzzle", fun
     end
 end)
 
-BadgesSection:NewButton("Get Tycoon (kinda sucks, fixing soon) ", "Automatically get the Tycoon badge", function()
-    repeat task.wait()
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Arena.Plate.CFrame * CFrame.new(0,2,0) * CFrame.Angles(math.rad(90), math.rad(0), math.rad(0))
-    until game.Players.LocalPlayer.PlayerGui.PlateIndicator.TextLabel.Text == "Plate Counter: 600"
+local teleporting = false
+local function teleport()
+    while teleporting do
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Arena.Plate.CFrame
+        end
+        wait(0.1)
+    end
+end
+
+local BadgesSection = BadgesTab:NewSection("use Slapple Farm for Slapple Badge")
+
+BadgesSection:NewToggle("Get Tycoon (tip: use extended, slap aura, and ;walkfling", "Teleports to the plate every 0.1 secondss", function(state)
+    teleporting = state
+    if state then
+        teleport()
+    end
 end)
 
 BadgesSection:NewButton("Get [REDACTED] (5k slaps)", "Get the [REDACTED] badge", function()
@@ -501,6 +562,331 @@ BadgesSection:NewToggle("Auto Collect Jet Orbs", "Auto-collect Jet Orbs", functi
         end
         task.wait()
     end
+end)
+
+
+BadgesSection:NewButton("Teleport to Staff Application Room (Admin Glove)", "Badge", function()
+        if game:GetService("ReplicatedStorage").Assets.Retro.Map then
+    game.ReplicatedStorage.Assets.Retro.Map.Parent = workspace
+    wait(0.4)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-16971.7168, 797.600342, 4905.17334, 0.230043754, -4.14069206e-08, 0.973180294, -1.62095546e-08, 1, 4.63797178e-08, -0.973180294, -2.64441837e-08, 0.230043754)
+    wait(0.4)
+    fireclickdetector(workspace.Map.RetroObbyMap:GetChildren()[5].StaffApp.Button.ClickDetector)
+    else
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-16971.7168, 797.600342, 4905.17334, 0.230043754, -4.14069206e-08, 0.973180294, -1.62095546e-08, 1, 4.63797178e-08, -0.973180294, -2.64441837e-08, 0.230043754)
+    wait(0.4)
+    fireclickdetector(workspace.Map.RetroObbyMap:GetChildren()[5].StaffApp.Button.ClickDetector)
+    end
+    end)
+    
+ 
+    
+    BadgesSection:NewButton("Get Lamp Glove", "Need ZZZZZZZ Glove", function()
+        if game.Players.LocalPlayer.leaderstats.Glove.Value == "ZZZZZZZ" then
+            for i = 1,5 do
+                game:GetService("ReplicatedStorage").nightmare:FireServer("LightBroken")
+            end
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Error",Text = "Need ZZZZZZZ Glove.",Icon = "rbxassetid://7733658504",Duration = 10})
+        end
+    end)
+    
+   
+    
+    BadgesSection:NewButton("Get Ice Skate Glove", "Badge", function()
+        local args = {
+        [1] = "Freeze"
+    }
+    
+    game:GetService("ReplicatedStorage").IceSkate:FireServer(unpack(args))
+    end)
+    
+
+    BadgesSection:NewDropdown("Maze Badge", "Badge", {"Counter", "Elude"}, function(y)
+        if y == "Counter" then
+            local teleportFunc = queueonteleport or queue_on_teleport or syn and syn.queue_on_teleport
+    if teleportFunc then
+        teleportFunc([[
+            if not game:IsLoaded() then
+                game.Loaded:Wait()
+            end
+            repeat wait() until game.Players.LocalPlayer
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-61.4113426, 4.67113781, -45.0443306, -0.0143145993, 0.00252397754, -0.999894321, -7.96703534e-06, 0.999996841, 0.00252435054, 0.99989748, 4.41164557e-05, -0.014314536)
+    wait(0.3)
+    fireclickdetector(game.Workspace.CounterLever.ClickDetector)
+    wait(1)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(15.2456455, 4.49108553, -233.529053, -0.631848156, -0.00334048411, 0.775085032, -1.25992265e-05, 0.999990761, 0.00429952005, -0.775092185, 0.00270687975, -0.631842375)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 2 minutes and 1 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 2 minutes to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 59 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 58 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 57 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 56 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 55 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 54 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 53 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 52 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 51 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 50 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 49 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 48 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 47 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 46 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 45 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 44 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 43 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 42 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 41 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 40 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 39 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 38 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 37 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 36 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 35 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 34 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 33 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 32 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 31 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 30 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 29 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 28 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 27 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 26 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 25 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 24 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 23 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 22 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 21 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 20 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 19 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 18 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 17 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 16 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 15 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 14 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 13 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 12 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 11 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 10 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 9 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 8 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 7 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 6 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 5 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 4 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 3 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 2 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 1 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 59 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 58 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 57 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 56 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 55 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 54 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 53 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 52 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 51 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 50 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 49 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 48 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 47 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 46 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 45 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 44 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 43 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 42 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 41 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 40 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 39 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 38 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 37 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 36 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 35 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 34 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 33 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 32 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 31 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 30 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 29 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 28 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 27 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 26 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 25 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 24 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 23 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 22 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 21 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 20 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 19 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 18 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 17 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 16 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 15 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 14 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 13 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 12 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 11 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 10 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 9 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 8 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 7 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 6 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 5 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 4 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 3 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 2 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
+    wait(1)
+    for i,v in pairs(workspace.Maze:GetDescendants()) do
+    if v:IsA("ClickDetector") then
+    fireclickdetector(v)
+    end
+    end
+        ]])
+    end
+    game:GetService("TeleportService"):Teleport(11828384869)
+elseif y == "Elude" then
+    local teleportFunc = queueonteleport or queue_on_teleport or syn and syn.queue_on_teleport
+    if teleportFunc then
+        teleportFunc([[
+            if not game:IsLoaded() then
+                game.Loaded:Wait()
+            end
+            repeat wait() until game.Players.LocalPlayer
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-193.290787, 7.39999914, -130.307114, 0.454088956, 1.82432505e-08, 0.890956342, -2.14201332e-08, 1, -9.55894652e-09, -0.890956342, -1.4743792e-08, 0.454088956)
+        wait(1)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(84.8454437, 7.39999914, -201.827698, 0.694604456, -5.9176017e-08, 0.719391882, 4.9516661e-08, 1, 3.44478792e-08, -0.719391882, 1.16942349e-08, 0.694604456)
+        wait(1)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(218.528198, 7.39999914, 83.4171371, 0.655885577, 5.49275381e-09, 0.754860282, -1.8204565e-08, 1, 8.54112692e-09, -0.754860282, -1.9343906e-08, 0.655885577)
+        wait(1)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(104.568184, 10.5492659, 194.721115, 0.990249932, -0.136891961, 0.0258003082, -0.0024311184, 0.168200076, 0.9857499, -0.139280856, -0.976201475, 0.166227311)
+        wait(2)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-502.335632, 14.2279472, -179.596512, 1, 0, 0, 0, -0.965929747, 0.258804798, 0, -0.258804798, -0.965929747)
+        ]])
+    end
+    game:GetService("TeleportService"):Teleport(11828384869)
+end
 end)
 
 BadgesSection:NewToggle("Auto Collect Phase Orbs", "Auto-collect Phase Orbs", function(Value)
