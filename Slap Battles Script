@@ -1,3 +1,4 @@
+-- loadstring for all you mobile users loadstring(game:HttpGet('https://pastebin.com/anuVuXjv'))()
 -- made with ChatGPT 4-0, for testing purposes
 -- somehow this is better than any other script for this game i've seen so far
 -- Kavo UI Library setup
@@ -265,7 +266,7 @@ RunService.Heartbeat:Connect(checkFall)
 
 -- Variables
 local originalCFrame = CFrame.new(-4.08799744, -8.92285156, 1.83599997) * CFrame.Angles(0, 0, math.rad(0.06))
-local platformSize = Vector3.new(2000, 1, 2000) -- Flat, 1 stud high
+local platformSize = Vector3.new(3000, 1, 3000) -- Flat, 1 stud high
 local platform
 local isPlatformVisible = false
 
