@@ -192,6 +192,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 
+
 --Slapple stuff
 local SlappleFarmTab = Window:NewTab("Slapple Farm")
 local SlappleFarmSection = SlappleFarmTab:NewSection("farm slapples")
@@ -421,7 +422,7 @@ extrashitSection:NewToggle("Auto Click Tycoon", "Automatically clicks the Tycoon
 end)
 
 
-extrashitSection:NewButton("Give Reaper 20 kills (press this after they slap you)", "ButtonInfo", function()
+extrashitSection:NewButton("Remove reaper slap effect (use after they slap you)", "ButtonInfo", function()
     for i = 1, 20 do
         game:GetService("ReplicatedStorage"):WaitForChild("HumanoidDied"):FireServer(x, false)
     end
@@ -917,4 +918,44 @@ end)
 
 BadgesSection:NewButton("Get The Lone Orange Badge", "Get The Lone Orange badge", function()
     fireclickdetector(game.Workspace.Arena.island5.Orange.ClickDetector)
+end)
+
+
+--Slapple stuff
+local HalloweenTab = Window:NewTab("🎃🎃")
+local HalloweenSection = HalloweenTab:NewSection("spooky script")
+
+local candyCornFolder = workspace:WaitForChild("CandyCorns")
+local autoFarmEnabled = false
+
+-- Function to fire the TouchInterest
+local function fireTouchInterest(part)
+    local touchInterest = part:FindFirstChildOfClass("TouchTransmitter") or part:FindFirstChild("TouchInterest")
+    if touchInterest then
+        firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, part, 0)
+        wait(0.3) -- Delay between touches
+        firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, part, 1)
+    end
+end
+
+-- Function to collect candy corn parts constantly
+local function autoFarmCandyCorns()
+    while autoFarmEnabled do
+        -- Go through all parts in CandyCorns
+        for _, part in ipairs(candyCornFolder:GetChildren()) do
+            if part:IsA("BasePart") then
+                fireTouchInterest(part)
+            end
+        end
+        wait(0.1) -- Adjust wait time between checks (you can change this)
+    end
+end
+
+-- Toggle Button for AutoFarm
+HalloweenSection:NewToggle("AutoFarm Candy Corns", "Toggles Candy Corn AutoFarm on or off", function(state)
+    autoFarmEnabled = state
+    if autoFarmEnabled then
+        -- Start the autofarm if enabled
+        autoFarmCandyCorns()
+    end
 end)
