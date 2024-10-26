@@ -1,1 +1,1 @@
-loadstring(game:HttpGet('https://raw.githubusercontent.com/usydusgduy123/ChatGPT-4-0-Slap-Battles-script/refs/heads/main/Slap%20Battles%20Script'))()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/usydusgduy123/slap-battles-script/refs/heads/main/Slap%20Battles%20Script'))()
