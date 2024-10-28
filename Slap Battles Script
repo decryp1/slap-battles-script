@@ -308,7 +308,8 @@ AntiFallSection:NewToggle("Invisible Floor Anti Fall", "Toggle the invisible pla
     togglePlatform()
 end)
 
-AntiFallSection:NewButton("Delete Void/Death Barriers (not lobby)", "Deletes all specified barriers", function()
+AntiFallSection:NewButton("Delete Void/Death Barriers (not lobby)", "Deletes all specified barriers and touch interests", function()
+    -- Specify parts to delete
     local partsToDelete = {
         workspace:FindFirstChild("DEATHBARRIER"),
         workspace:FindFirstChild("DEATHBARRIER2"),
@@ -317,9 +318,20 @@ AntiFallSection:NewButton("Delete Void/Death Barriers (not lobby)", "Deletes all
         workspace:FindFirstChild("AntiDefaultArena")
     }
 
+    -- Delete the specified parts
     for _, part in ipairs(partsToDelete) do
         if part then
             part:Destroy()
+        end
+    end
+
+    -- Delete all TouchInterests in workspace.Lobby.LobbyFrame
+    local lobbyFrame = workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("LobbyFrame")
+    if lobbyFrame then
+        for _, descendant in ipairs(lobbyFrame:GetDescendants()) do
+            if descendant:IsA("TouchTransmitter") then
+                descendant:Destroy()
+            end
         end
     end
 end)
