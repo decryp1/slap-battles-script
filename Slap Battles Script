@@ -147,6 +147,7 @@ local gloveList = {
     {"God's Hand", "(NOT SUPPORTED)"},
     {"The Flex", "FlexHit"},
     {"CULT", "CULTHit"},
+    {"buddies", "buddiesHIT"},
     {"Tycoon", "GeneralHit"},
     {"Orbit", "Orbihit"},
     {"Avatar (works for Avatar and the Normal Glove", "GeneralHit"},
