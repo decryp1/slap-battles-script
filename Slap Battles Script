@@ -148,10 +148,8 @@ local gloveList = {
     {"The Flex", "FlexHit"},
     {"CULT", "CULTHit"},
     {"buddies", "buddiesHIT"},
-    {"Scythe", "GeneralHit"},
     {"Tycoon", "GeneralHit"},
     {"Orbit", "Orbihit"},
-    {"fart", "CULTHit"},
     {"Avatar (works for Avatar and the Normal Glove", "GeneralHit"},
     {"Frostbite", "GeneralHit"}
 }
