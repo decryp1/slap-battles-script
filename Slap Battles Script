@@ -360,6 +360,71 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
+local player = game.Players.LocalPlayer
+local hrp = nil -- HumanoidRootPart reference (updated on respawn)
+local toggle = false -- Initial state for toggle
+local slappedPlayers = {} -- Table to store recently slapped players
+
+-- Update HumanoidRootPart on respawn
+player.CharacterAdded:Connect(function(character)
+    hrp = character:WaitForChild("HumanoidRootPart")
+end)
+
+-- Set initial HumanoidRootPart
+if player.Character then
+    hrp = player.Character:FindFirstChild("HumanoidRootPart")
+end
+
+PlayerSection:NewToggle("Autofarm Toggle", "Toggle autofarming on/off", function(state)
+    toggle = state
+end)
+
+-- Function to find the closest unslapped player in the arena
+function findClosestTarget()
+    local closestTarget = nil
+    local closestDistance = math.huge
+
+    for _, target in ipairs(game.Players:GetPlayers()) do
+        if target ~= player and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            local inArenaStat = workspace:FindFirstChild(target.Name) and workspace[target.Name]:FindFirstChild("isInArena")
+            if inArenaStat and inArenaStat.Value == true and not slappedPlayers[target.Name] then
+                local distance = (hrp.Position - target.Character.HumanoidRootPart.Position).magnitude
+                if distance < closestDistance then
+                    closestDistance = distance
+                    closestTarget = target
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+-- Teleport loop for continuous tracking and target switching
+spawn(function()
+    while true do
+        if toggle and hrp then
+            local target = findClosestTarget()
+            if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                local startTime = tick()
+                
+                -- Continuous teleportation loop with a controlled delay
+                while toggle and (tick() - startTime < 0.6) do
+                    hrp.CFrame = CFrame.new(target.Character.HumanoidRootPart.Position - Vector3.new(0, 10, 0))
+                    wait(0.05) -- Slight delay to avoid resource overload
+                end
+                
+                -- Mark target as slapped and set cooldown
+                slappedPlayers[target.Name] = true
+                spawn(function()
+                    wait(1) -- 1-second cooldown before allowing to target again
+                    slappedPlayers[target.Name] = nil
+                end)
+            end
+        else
+            wait(0.1) -- Small wait to avoid unnecessary resource use when toggle is off
+        end
+    end
+end)
 
 -- Connections storage
 local HumanModCons = {}
@@ -1040,7 +1105,8 @@ HalloweenSection:NewTextBox("Candycorn Editor", "Type the amount you want", func
     end
 end)
 local ChangesTab = Window:NewTab("Change Logs")
+local ChangesSection = ChangesTab:NewSection("10/30/24: added a janky little autofarm that doesnt really work")
 local ChangesSection = ChangesTab:NewSection("10/30/24: added a candycorn editor to halloween section")
-local ChangesSection = ChangesTab:NewSection("10/30/24: made a leaderboard editor and uieditor section)
+local ChangesSection = ChangesTab:NewSection("10/30/24: made a leaderboard editor and uieditor section")
 local ChangesSection = ChangesTab:NewSection("10/30/24: added fallback support to regular gloves")
 local ChangesSection = ChangesTab:NewSection("10/30/24: Made Changes tab.")
