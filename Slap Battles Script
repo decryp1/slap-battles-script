@@ -353,7 +353,7 @@ end)
 
 local PlayerTab = Window:NewTab("Player")
 local PlayerSection = PlayerTab:NewSection("Player")
-local PlayerSection = PlayerTab:NewSection("funny stuff that is funny")
+local PlayerSection = PlayerTab:NewSection("speed and jump sometimes breaks, use infinite yield")
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -945,6 +945,36 @@ BadgesSection:NewButton("Get The Lone Orange Badge", "Get The Lone Orange badge"
     fireclickdetector(game.Workspace.Arena.island5.Orange.ClickDetector)
 end)
 
+local uieditorTab = Window:NewTab("leaderboard")
+local uieditorSection = uieditorTab:NewSection("ALL OF THIS IS FAKE! ONLY YOU SEE IT!")
+local uieditorSection = uieditorTab:NewSection("only edits the leaderboard, troll your friends!")
+
+uieditorSection:NewTextBox("edit slaps number", "Type the amount of slaps you want", function(value)
+    local slapsValue = tonumber(value)
+    if slapsValue then
+        local slaps = game:GetService("Players").LocalPlayer:FindFirstChild("leaderstats")
+                        and game.Players.LocalPlayer.leaderstats:FindFirstChild("Slaps")
+
+        if slaps then
+            slaps.Value = slapsValue
+        else
+            warn("Slaps value not found in leaderstats.")
+        end
+    else
+        warn("Please enter a valid number for slaps.")
+    end
+end)
+
+
+uieditorSection:NewTextBox("Edit Glove Name", "Type the glove value you want", function(value)
+    local glove = game:GetService("Players").LocalPlayer:FindFirstChild("leaderstats")
+                    and game.Players.LocalPlayer.leaderstats:FindFirstChild("Glove")
+    if glove then
+        glove.Value = value  
+    else
+        warn("Glove value not found in leaderstats.")
+    end
+end)
 
 --Slapple stuff
 local HalloweenTab = Window:NewTab("🎃🎃")
@@ -984,3 +1014,33 @@ HalloweenSection:NewToggle("AutoFarm Candy Corns", "Toggles Candy Corn AutoFarm 
         autoFarmCandyCorns()
     end
 end)
+
+local HalloweenSection = HalloweenTab:NewSection("THE CANDYCORN EDITOR IS FAKE! (must be number)")
+-- Create TextBox to enter the desired candy corn count
+HalloweenSection:NewTextBox("Candycorn Editor", "Type the amount you want", function(value)
+    -- Convert the entered value to a number
+    local candyCornCount = tonumber(value)
+
+    -- Ensure the value is a valid number
+    if candyCornCount then
+        -- Access the TextLabel and set it to "entered number / 2000"
+        local textLabel = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
+                            and game.Players.LocalPlayer.PlayerGui:FindFirstChild("CandyCount")
+                            and game.Players.LocalPlayer.PlayerGui.CandyCount:FindFirstChild("ImageLabel")
+                            and game.Players.LocalPlayer.PlayerGui.CandyCount.ImageLabel:FindFirstChild("TextLabel")
+
+        if textLabel then
+            -- Display the text as "entered number / 2000"
+            textLabel.Text = tostring(candyCornCount) .. " / 2000"
+        else
+            warn("CandyCount TextLabel not found.")
+        end
+    else
+        warn("Please enter a valid number.")
+    end
+end)
+local ChangesTab = Window:NewTab("Change Logs")
+local ChangesSection = ChangesTab:NewSection("10/30/24: added a candycorn editor to halloween section")
+local ChangesSection = ChangesTab:NewSection("10/30/24: made a leaderboard editor and uieditor section)
+local ChangesSection = ChangesTab:NewSection("10/30/24: added fallback support to regular gloves")
+local ChangesSection = ChangesTab:NewSection("10/30/24: Made Changes tab.")
