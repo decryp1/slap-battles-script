@@ -1045,41 +1045,37 @@ end)
 local HalloweenTab = Window:NewTab("🎃🎃")
 local HalloweenSection = HalloweenTab:NewSection("spooky script")
 
-local candyCornFolder = workspace:WaitForChild("CandyCorns")
-local autoFarmEnabled = false
+local player = game.Players.LocalPlayer
+local toggle = false -- Initial state for toggle
 
--- Function to fire the TouchInterest
-local function fireTouchInterest(part)
-    local touchInterest = part:FindFirstChildOfClass("TouchTransmitter") or part:FindFirstChild("TouchInterest")
-    if touchInterest then
-        firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, part, 0)
-        wait(0.3) -- Delay between touches
-        firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, part, 1)
-    end
-end
-
--- Function to collect candy corn parts constantly
-local function autoFarmCandyCorns()
-    while autoFarmEnabled do
-        -- Go through all parts in CandyCorns
-        for _, part in ipairs(candyCornFolder:GetChildren()) do
-            if part:IsA("BasePart") then
-                fireTouchInterest(part)
-            end
-        end
-        wait(0.1) -- Adjust wait time between checks (you can change this)
-    end
-end
-
--- Toggle Button for AutoFarm
-HalloweenSection:NewToggle("AutoFarm Candy Corns", "Toggles Candy Corn AutoFarm on or off", function(state)
-    autoFarmEnabled = state
-    if autoFarmEnabled then
-        -- Start the autofarm if enabled
-        autoFarmCandyCorns()
-    end
+HalloweenSection:NewToggle("Candycorn Farm", "Automatically touches all Candy Corns", function(state)
+    toggle = state
 end)
 
+-- Function to "touch" each TouchInterest
+function autoTouchCandyCorns()
+    while toggle do
+        for _, candyCorn in ipairs(workspace.CandyCorns:GetChildren()) do
+            if candyCorn:IsA("BasePart") and candyCorn:FindFirstChild("TouchInterest") then
+                firetouchinterest(player.Character.HumanoidRootPart, candyCorn, 0) -- Simulate touch
+                wait(0.01) -- Small delay to prevent overload
+                firetouchinterest(player.Character.HumanoidRootPart, candyCorn, 1) -- End touch
+            end
+        end
+        wait(0.1) -- Delay before looping through all Candy Corns again
+    end
+end
+
+-- Start auto touch loop
+spawn(function()
+    while true do
+        if toggle then
+            autoTouchCandyCorns()
+        else
+            wait(0.1) -- Small wait to avoid resource use when toggle is off
+        end
+    end
+end)
 local HalloweenSection = HalloweenTab:NewSection("THE CANDYCORN EDITOR IS FAKE! (must be number)")
 -- Create TextBox to enter the desired candy corn count
 HalloweenSection:NewTextBox("Candycorn Editor", "Type the amount you want", function(value)
@@ -1105,6 +1101,7 @@ HalloweenSection:NewTextBox("Candycorn Editor", "Type the amount you want", func
     end
 end)
 local ChangesTab = Window:NewTab("Change Logs")
+local ChangesSection = ChangesTab:NewSection("10/30/24: improved the candy corn auto farm, and made another.")
 local ChangesSection = ChangesTab:NewSection("10/30/24: added a janky little autofarm that doesnt really work")
 local ChangesSection = ChangesTab:NewSection("10/30/24: added a candycorn editor to halloween section")
 local ChangesSection = ChangesTab:NewSection("10/30/24: made a leaderboard editor and uieditor section")
