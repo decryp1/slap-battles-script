@@ -248,6 +248,91 @@ end
 -- Continuous check for actions
 RunService.RenderStepped:Connect(onUpdate)
 
+SlappleFarmSection:NewButton("Grab slapples and serverhop (put in autoexec)", "grabs any slapples and serverhops to different slapples", function(state)
+    local player = game.Players.LocalPlayer
+local teleportService = game:GetService("TeleportService")
+local httpService = game:GetService("HttpService")
+local placeId, jobId = game.PlaceId, game.JobId
+
+-- Wait until the player’s character and essential parts are loaded
+repeat wait() until player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+repeat wait() until workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("Teleport1") and workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples")
+
+-- Function to teleport to Arena
+local function teleportToArena()
+    local teleportTouch = workspace.Lobby.Teleport1:FindFirstChild("TouchInterest")
+    if teleportTouch then
+        firetouchinterest(player.Character.HumanoidRootPart, workspace.Lobby.Teleport1, 0)
+        firetouchinterest(player.Character.HumanoidRootPart, workspace.Lobby.Teleport1, 1)
+    end
+end
+
+-- Function to fire TouchInterests for Slapples
+local function farmSlapples()
+    local slappleContainer = workspace.Arena.island5.Slapples
+    local slapplesPresent = false
+
+    for _, slapple in ipairs(slappleContainer:GetChildren()) do
+        if slapple:IsA("Model") and slapple:FindFirstChild("Glove") then
+            local glove = slapple.Glove
+            if glove:FindFirstChild("TouchInterest") then
+                firetouchinterest(player.Character.HumanoidRootPart, glove, 0)
+                firetouchinterest(player.Character.HumanoidRootPart, glove, 1)
+                slapplesPresent = true -- At least one slapple was present
+            end
+        end
+    end
+    return slapplesPresent
+end
+
+-- Function to server hop
+local function serverHop()
+    local httpRequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+    if httpRequest then
+        local servers = {}
+        local req = httpRequest({
+            Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true", placeId)
+        })
+        local body = httpService:JSONDecode(req.Body)
+
+        if body and body.data then
+            for _, server in ipairs(body.data) do
+                if type(server) == "table" and tonumber(server.playing) and tonumber(server.maxPlayers) and server.playing < server.maxPlayers and server.id ~= jobId then
+                    table.insert(servers, server.id)
+                end
+            end
+        end
+
+        if #servers > 0 then
+            teleportService:TeleportToPlaceInstance(placeId, servers[math.random(1, #servers)], player)
+        else
+            warn("Serverhop: Couldn't find a server.")
+        end
+    else
+        warn("Incompatible Exploit: Your exploit does not support this serverhop script (missing request)")
+    end
+end
+
+-- Main loop to teleport to arena, farm slapples, and server hop
+while true do
+    -- Step 1: Teleport to Arena
+    teleportToArena()
+    wait(1) -- Give time for the teleport to complete
+
+    -- Step 2: Farm slapples continuously until none are left
+    local slapplesFound
+    repeat
+        slapplesFound = farmSlapples()
+        wait(0.1) -- Small delay before checking for slapples again
+    until not slapplesFound -- Continue farming until no slapples are left
+
+    -- Step 3: Server hop when all slapples in the server are collected
+    serverHop()
+    wait(5) -- Wait to ensure teleport before resuming
+end
+
+end)
+
 -- Anti Fall Tab and Toggle
 local AntiFallTab = Window:NewTab("Anti Fall")
 local AntiFallSection = AntiFallTab:NewSection("Anti Fall")
@@ -1048,7 +1133,7 @@ local HalloweenSection = HalloweenTab:NewSection("spooky script")
 local player = game.Players.LocalPlayer
 local toggle = false -- Initial state for toggle
 
-HalloweenSection:NewToggle("Candycorn Farm", "Automatically touches all Candy Corns", function(state)
+HalloweenSection:NewToggle("Candycorn Farm v1 (fire touchinterests)", "Automatically touches all Candy Corns", function(state)
     toggle = state
 end)
 
@@ -1076,6 +1161,49 @@ spawn(function()
         end
     end
 end)
+local toggle = false -- Initial state for toggle
+local originalSizes = {} -- Store original sizes to revert when toggled off
+
+HalloweenSection:NewToggle("Candycorn Farm v2 (makes them really big)", "Toggle size of all Candy Corns to 10000,10000,10000", function(state)
+    toggle = state
+    if not toggle then
+        -- Reset sizes to original when toggled off
+        for candyCorn, originalSize in pairs(originalSizes) do
+            if candyCorn and candyCorn:IsA("BasePart") then
+                candyCorn.Size = originalSize
+            end
+        end
+    end
+end)
+
+-- Function to resize a Candy Corn part
+local function resizeCandyCorn(candyCorn)
+    if not originalSizes[candyCorn] then
+        originalSizes[candyCorn] = candyCorn.Size -- Store original size
+    end
+    candyCorn.Size = Vector3.new(10000, 10000, 10000) -- Set new size
+end
+
+-- Monitor Candy Corns for changes
+workspace.CandyCorns.ChildAdded:Connect(function(candyCorn)
+    if toggle and candyCorn:IsA("BasePart") then
+        resizeCandyCorn(candyCorn)
+    end
+end)
+
+-- Main loop to continuously check all parts
+spawn(function()
+    while true do
+        if toggle then
+            for _, candyCorn in ipairs(workspace.CandyCorns:GetChildren()) do
+                if candyCorn:IsA("BasePart") and candyCorn.Size ~= Vector3.new(10000, 10000, 10000) then
+                    resizeCandyCorn(candyCorn)
+                end
+            end
+        end
+        wait(1) -- Small delay before rechecking
+    end
+end)
 local HalloweenSection = HalloweenTab:NewSection("THE CANDYCORN EDITOR IS FAKE! (must be number)")
 -- Create TextBox to enter the desired candy corn count
 HalloweenSection:NewTextBox("Candycorn Editor", "Type the amount you want", function(value)
@@ -1101,7 +1229,8 @@ HalloweenSection:NewTextBox("Candycorn Editor", "Type the amount you want", func
     end
 end)
 local ChangesTab = Window:NewTab("Change Logs")
-local ChangesSection = ChangesTab:NewSection("10/30/24: improved the candy corn auto farm, and made another.")
+local ChangesSection = ChangesTab:NewSection("10/30/24: added a slapple serverhop farm (autoexecute)")
+local ChangesSection = ChangesTab:NewSection("10/30/24: unpatched candycorn farm")
 local ChangesSection = ChangesTab:NewSection("10/30/24: added a janky little autofarm that doesnt really work")
 local ChangesSection = ChangesTab:NewSection("10/30/24: added a candycorn editor to halloween section")
 local ChangesSection = ChangesTab:NewSection("10/30/24: made a leaderboard editor and uieditor section")
