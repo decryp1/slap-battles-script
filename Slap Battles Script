@@ -21,7 +21,7 @@ local selectedRemote = "b" -- Default remote
 
 -- Function to slap the closest player within the slap distance
 local function slapClosestPlayer()
-    if not slapEnabled then return end -- Only proceed if Slap Aura is enabled
+    if not slapEnabled then return end -- only do the rest if the slap aura is set to true
 
     local closestPlayer = nil
     local closestDistance = slapDistance
@@ -180,12 +180,12 @@ SlapAuraSection:NewDropdown("Select Glove", "Choose a glove to set the remote", 
     end
 end)
 
--- UI Elements for Slap Aura
+
 SlapAuraSection:NewToggle("Enable Slap Aura", "Toggle the Slap Aura on/off", function(state)
     slapEnabled = state
 end)
 
-SlapAuraSection:NewSlider("Slap Distance", "Set the distance for the Slap Aura", 50, 1, slapDistance, function(value)
+SlapAuraSection:NewSlider("random slider", "Set the distance for the Slap Aura", 50, 1, slapDistance, function(value)
     slapDistance = value
 end)
 
@@ -195,7 +195,6 @@ local part = workspace.Arena["main island"].Grass
 player.HumanoidRootPart.CFrame = part.CFrame
     end)
 
--- Update handling using RunService
 local RunService = game:GetService("RunService")
 
 RunService.RenderStepped:Connect(function()
@@ -204,21 +203,13 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-
-
---Slapple stuff
 local SlappleFarmTab = Window:NewTab("Slapple Farm")
 local SlappleFarmSection = SlappleFarmTab:NewSection("farm slapples")
-
-
--- Slapple Farm Section
 
 SlappleFarmSection:NewToggle("Enable Slapple Farm", "Toggle the Slapple Farm on/off", function(state)
     slappleFarmEnabled = state
 end)
 
-
--- Function to fire TouchInterests for Slapples
 local function farmSlapples()
     local slappleContainer = workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples")
     if slappleContainer then
@@ -234,7 +225,6 @@ local function farmSlapples()
     end
 end
 
--- Function to update slap and slapple farm checks
 local function onUpdate()
     if slapEnabled then
         slapClosestPlayer()
@@ -245,7 +235,7 @@ local function onUpdate()
 end
 
 
--- Continuous check for actions
+-- continuous check for slapples
 RunService.RenderStepped:Connect(onUpdate)
 
 SlappleFarmSection:NewButton("Grab slapples and serverhop (put in autoexec)", "grabs any slapples and serverhops to different slapples", function(state)
@@ -254,11 +244,10 @@ local teleportService = game:GetService("TeleportService")
 local httpService = game:GetService("HttpService")
 local placeId, jobId = game.PlaceId, game.JobId
 
--- Wait until the player’s character and essential parts are loaded
+-- wait until the player is loaded enough to start the farm
 repeat wait() until player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 repeat wait() until workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("Teleport1") and workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples")
 
--- Function to teleport to Arena
 local function teleportToArena()
     local teleportTouch = workspace.Lobby.Teleport1:FindFirstChild("TouchInterest")
     if teleportTouch then
@@ -267,7 +256,6 @@ local function teleportToArena()
     end
 end
 
--- Function to fire TouchInterests for Slapples
 local function farmSlapples()
     local slappleContainer = workspace.Arena.island5.Slapples
     local slapplesPresent = false
@@ -285,7 +273,6 @@ local function farmSlapples()
     return slapplesPresent
 end
 
--- Function to server hop
 local function serverHop()
     local httpRequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
     if httpRequest then
@@ -313,7 +300,7 @@ local function serverHop()
     end
 end
 
--- Main loop to teleport to arena, farm slapples, and server hop
+--loop to teleport to arena, farm slapples, and server hop
 while true do
     -- Step 1: Teleport to Arena
     teleportToArena()
@@ -333,20 +320,16 @@ end
 
 end)
 
--- Anti Fall Tab and Toggle
 local AntiFallTab = Window:NewTab("Anti Fall")
 local AntiFallSection = AntiFallTab:NewSection("Anti Fall")
 
--- Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
--- Variables
 local player = Players.LocalPlayer
 local teleportCFrame = CFrame.new(-6.73902416, -5.20054817, 1.95076489, -0.136649311, -0.00766478525, -0.990589857, -0.000125628911, 0.999970198, -0.00772003829, 0.99061954, -0.000930505106, -0.136646196)
 local fallProtectionEnabled = false
 
--- Function to check if the player has fallen
 local function checkFall()
     if fallProtectionEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local yPosition = player.Character.HumanoidRootPart.Position.Y
@@ -360,10 +343,9 @@ AntiFallSection:NewToggle("Teleport Anti Fall", "Toggle the Anti Fall protection
     fallProtectionEnabled = state
 end)
 
--- Continuous check for fall detection
+-- check for whenever the player falls 
 RunService.Heartbeat:Connect(checkFall)
 
--- Variables
 local originalCFrame = CFrame.new(-4.08799744, -8.92285156, 1.83599997) * CFrame.Angles(0, 0, math.rad(0.06))
 local platformSize = Vector3.new(3000, 1, 3000) -- Flat, 1 stud high
 local platform
@@ -383,14 +365,12 @@ local function createPlatform()
     platform.Parent = workspace
 end
 
--- Function to remove the platform
 local function removePlatform()
     if platform then
         platform.Parent = nil
     end
 end
 
--- Toggle function for the button
 local function togglePlatform()
     if isPlatformVisible then
         removePlatform()
@@ -400,13 +380,12 @@ local function togglePlatform()
     isPlatformVisible = not isPlatformVisible
 end
 
--- Kavo UI Button Setup
+
 AntiFallSection:NewToggle("Invisible Floor Anti Fall", "Toggle the invisible platform", function(state)
     togglePlatform()
 end)
 
 AntiFallSection:NewButton("Delete Void/Death Barriers (not lobby)", "Deletes all specified barriers and touch interests", function()
-    -- Specify parts to delete
     local partsToDelete = {
         workspace:FindFirstChild("DEATHBARRIER"),
         workspace:FindFirstChild("DEATHBARRIER2"),
@@ -414,15 +393,13 @@ AntiFallSection:NewButton("Delete Void/Death Barriers (not lobby)", "Deletes all
         workspace:FindFirstChild("dedBarrier"),
         workspace:FindFirstChild("AntiDefaultArena")
     }
-
-    -- Delete the specified parts
+    
     for _, part in ipairs(partsToDelete) do
         if part then
             part:Destroy()
         end
     end
 
-    -- Delete all TouchInterests in workspace.Lobby.LobbyFrame
     local lobbyFrame = workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("LobbyFrame")
     if lobbyFrame then
         for _, descendant in ipairs(lobbyFrame:GetDescendants()) do
@@ -432,9 +409,6 @@ AntiFallSection:NewButton("Delete Void/Death Barriers (not lobby)", "Deletes all
         end
     end
 end)
-
-
--- Other tabs and sections you have can go below here...
 
 local PlayerTab = Window:NewTab("Player")
 local PlayerSection = PlayerTab:NewSection("Player")
@@ -450,12 +424,10 @@ local hrp = nil -- HumanoidRootPart reference (updated on respawn)
 local toggle = false -- Initial state for toggle
 local slappedPlayers = {} -- Table to store recently slapped players
 
--- Update HumanoidRootPart on respawn
 player.CharacterAdded:Connect(function(character)
     hrp = character:WaitForChild("HumanoidRootPart")
 end)
 
--- Set initial HumanoidRootPart
 if player.Character then
     hrp = player.Character:FindFirstChild("HumanoidRootPart")
 end
@@ -464,7 +436,6 @@ PlayerSection:NewToggle("Autofarm Toggle", "Toggle autofarming on/off", function
     toggle = state
 end)
 
--- Function to find the closest unslapped player in the arena
 function findClosestTarget()
     local closestTarget = nil
     local closestDistance = math.huge
@@ -484,7 +455,6 @@ function findClosestTarget()
     return closestTarget
 end
 
--- Teleport loop for continuous tracking and target switching
 spawn(function()
     while true do
         if toggle and hrp then
@@ -492,13 +462,13 @@ spawn(function()
             if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
                 local startTime = tick()
                 
-                -- Continuous teleportation loop with a controlled delay
+                -- continuous teleportation loop with a controlled delay
                 while toggle and (tick() - startTime < 0.6) do
                     hrp.CFrame = CFrame.new(target.Character.HumanoidRootPart.Position - Vector3.new(0, 10, 0))
                     wait(0.05) -- Slight delay to avoid resource overload
                 end
                 
-                -- Mark target as slapped and set cooldown
+                -- mark target as slapped and set cooldown
                 slappedPlayers[target.Name] = true
                 spawn(function()
                     wait(1) -- 1-second cooldown before allowing to target again
@@ -506,25 +476,21 @@ spawn(function()
                 end)
             end
         else
-            wait(0.1) -- Small wait to avoid unnecessary resource use when toggle is off
+            wait(0.1) 
         end
     end
 end)
 
--- Connections storage
 local HumanModCons = {}
 
--- Function to handle WalkSpeed change
 local function WalkSpeedChange(speed)
     humanoid.WalkSpeed = speed
 end
 
--- Function to handle JumpPower change
 local function JumpPowerChange(power)
     humanoid.JumpPower = power
 end
 
--- Slider for WalkSpeed
 PlayerSection:NewSlider("Walk Speed", "Adjusts your walk speed", 150, 16, function(value)
     local speed = value
     if isnumber(speed) then
@@ -542,7 +508,6 @@ PlayerSection:NewSlider("Walk Speed", "Adjusts your walk speed", 150, 16, functi
     end
 end)
 
--- Slider for JumpPower
 PlayerSection:NewSlider("Jump Power", "Adjusts your jump power", 150, 50, function(value)
     local power = value
     if isnumber(power) then
@@ -560,7 +525,6 @@ PlayerSection:NewSlider("Jump Power", "Adjusts your jump power", 150, 50, functi
     end
 end)
 
--- Cleanup function when the player leaves
 Players.PlayerRemoving:Connect(function(removingPlayer)
     if removingPlayer == player then
         if HumanModCons.wsLoop then HumanModCons.wsLoop:Disconnect() end
@@ -570,16 +534,14 @@ Players.PlayerRemoving:Connect(function(removingPlayer)
     end
 end)
 
--- Function to check if a value is a number
 function isnumber(value)
     return type(value) == "number"
 end
 
-
 local extrashitTab = Window:NewTab("extra stuff")
 local extrashitSection = extrashitTab:NewSection("some cool useful stuff")
 
-extrashitSection:NewToggle("Auto Click Tycoon", "Automatically clicks the Tycoon button", function(Value)
+extrashitSection:NewToggle("Auto Click Tycoon BROKEN", "Automatically clicks the Tycoon button", function(Value)
     AutoTycoon = Value
     for i,v in pairs(workspace:GetDescendants()) do
         if v.Name == "End" and v.ClassName == "Part" then
@@ -609,7 +571,7 @@ extrashitSection:NewButton("Remove reaper slap effect (use after they slap you)"
     end
 end)
 
-extrashitSection:NewToggle("Rhythm Explosion Spam (All gloves)", "Toggles the rhythm explosion spam", function(state)
+extrashitSection:NewToggle("Rhythm Explosion Spam BROKEN", "Toggles the rhythm explosion spam", function(state)
     RhythmSpam = state
     while RhythmSpam do
         game:GetService("ReplicatedStorage").rhythmevent:FireServer("AoeExplosion", 0)
@@ -617,7 +579,7 @@ extrashitSection:NewToggle("Rhythm Explosion Spam (All gloves)", "Toggles the rh
     end
 end)
 
-extrashitSection:NewToggle("Null Ability (all gloves)", "Toggles the Null ability loop", function(state)
+extrashitSection:NewToggle("Null Ability BROKEN", "Toggles the Null ability loop", function(state)
     NullSpam = state
     while NullSpam do
         game:GetService("ReplicatedStorage").NullAbility:FireServer()
@@ -793,238 +755,14 @@ BadgesSection:NewButton("Teleport to Staff Application Room (Admin Glove)", "Bad
     fireclickdetector(game.Workspace.CounterLever.ClickDetector)
     wait(1)
     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(15.2456455, 4.49108553, -233.529053, -0.631848156, -0.00334048411, 0.775085032, -1.25992265e-05, 0.999990761, 0.00429952005, -0.775092185, 0.00270687975, -0.631842375)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 2 minutes and 1 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 2 minutes to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 59 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 58 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 57 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 56 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 55 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 54 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 53 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 52 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 51 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 50 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 49 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 48 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 47 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 46 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 45 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 44 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 43 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 42 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 41 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 40 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 39 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 38 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 37 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 36 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 35 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 34 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 33 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 32 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 31 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 30 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 29 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 28 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 27 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 26 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 25 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 24 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 23 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 22 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 21 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 20 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 19 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 18 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 17 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 16 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 15 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 14 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 13 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 12 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 11 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 10 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 9 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 8 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 7 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 6 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 5 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 4 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 3 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 2 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 1 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 59 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 58 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 57 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 56 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 55 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 54 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 53 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 52 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 51 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 50 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 49 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 48 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 47 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 46 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 45 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 44 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 43 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 42 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 41 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 40 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 39 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 38 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 37 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 36 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 35 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 34 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 33 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 32 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 31 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 30 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 29 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 28 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 27 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 26 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 25 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 24 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 23 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 22 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 21 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 20 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 19 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 18 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 17 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 16 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 15 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 14 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 13 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 12 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 11 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 10 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 9 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 8 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 7 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 6 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 2 minutes to receive.",Icon = "rbxassetid://7733656100",Duration = 5})
+    wait(30)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 30 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 5})
+    wait(30)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes to receive.",Icon = "rbxassetid://7733656100",Duration = 5})
+    wait(30)
+    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 30 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 5})
+    wait(25)
     game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 5 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
     wait(1)
     game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 4 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
@@ -1108,10 +846,10 @@ uieditorSection:NewTextBox("edit slaps number", "Type the amount of slaps you wa
         if slaps then
             slaps.Value = slapsValue
         else
-            warn("Slaps value not found in leaderstats.")
+            warn("cant find your slaps? is your game loaded yet? report this error to the discord!")
         end
     else
-        warn("Please enter a valid number for slaps.")
+        warn("enter a number, no letters, please!")
     end
 end)
 
@@ -1126,7 +864,6 @@ uieditorSection:NewTextBox("Edit Glove Name", "Type the glove value you want", f
     end
 end)
 
---Slapple stuff
 local HalloweenTab = Window:NewTab("🎃🎃")
 local HalloweenSection = HalloweenTab:NewSection("spooky script")
 
@@ -1136,38 +873,35 @@ local toggle = false -- Initial state for toggle
 HalloweenSection:NewToggle("Candycorn Farm v1 (fire touchinterests)", "Automatically touches all Candy Corns", function(state)
     toggle = state
 end)
-
--- Function to "touch" each TouchInterest
 function autoTouchCandyCorns()
     while toggle do
         for _, candyCorn in ipairs(workspace.CandyCorns:GetChildren()) do
             if candyCorn:IsA("BasePart") and candyCorn:FindFirstChild("TouchInterest") then
-                firetouchinterest(player.Character.HumanoidRootPart, candyCorn, 0) -- Simulate touch
+                firetouchinterest(player.Character.HumanoidRootPart, candyCorn, 0)
                 wait(0.01) -- Small delay to prevent overload
-                firetouchinterest(player.Character.HumanoidRootPart, candyCorn, 1) -- End touch
+                firetouchinterest(player.Character.HumanoidRootPart, candyCorn, 1)
             end
         end
-        wait(0.1) -- Delay before looping through all Candy Corns again
+        wait(0.1)
     end
 end
 
--- Start auto touch loop
 spawn(function()
     while true do
         if toggle then
             autoTouchCandyCorns()
         else
-            wait(0.1) -- Small wait to avoid resource use when toggle is off
+            wait(0.1)
         end
     end
 end)
-local toggle = false -- Initial state for toggle
-local originalSizes = {} -- Store original sizes to revert when toggled off
+local toggle = false
+local originalSizes = {} -- this keeps track of the original sizes so that it can turn off easier
 
 HalloweenSection:NewToggle("Candycorn Farm v2 (makes them really big)", "Toggle size of all Candy Corns to 10000,10000,10000", function(state)
     toggle = state
     if not toggle then
-        -- Reset sizes to original when toggled off
+        -- reset the candycorn sizes to original when toggled off
         for candyCorn, originalSize in pairs(originalSizes) do
             if candyCorn and candyCorn:IsA("BasePart") then
                 candyCorn.Size = originalSize
@@ -1181,17 +915,16 @@ local function resizeCandyCorn(candyCorn)
     if not originalSizes[candyCorn] then
         originalSizes[candyCorn] = candyCorn.Size -- Store original size
     end
-    candyCorn.Size = Vector3.new(10000, 10000, 10000) -- Set new size
+    candyCorn.Size = Vector3.new(10000, 10000, 10000) -- they patched the TouchInterest method, so i just found the next best way of farming
 end
 
--- Monitor Candy Corns for changes
+-- check for new candycorns if any spawn, get collected, and if they should be collected
 workspace.CandyCorns.ChildAdded:Connect(function(candyCorn)
     if toggle and candyCorn:IsA("BasePart") then
         resizeCandyCorn(candyCorn)
     end
 end)
 
--- Main loop to continuously check all parts
 spawn(function()
     while true do
         if toggle then
@@ -1201,7 +934,7 @@ spawn(function()
                 end
             end
         end
-        wait(1) -- Small delay before rechecking
+        wait(1)
     end
 end)
 local HalloweenSection = HalloweenTab:NewSection("THE CANDYCORN EDITOR IS FAKE! (must be number)")
@@ -1212,7 +945,7 @@ HalloweenSection:NewTextBox("Candycorn Editor", "Type the amount you want", func
 
     -- Ensure the value is a valid number
     if candyCornCount then
-        -- Access the TextLabel and set it to "entered number / 2000"
+        -- this lets whatever you put in for your candycorn to also have a "/ 2000" in it, just so it looks legit
         local textLabel = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
                             and game.Players.LocalPlayer.PlayerGui:FindFirstChild("CandyCount")
                             and game.Players.LocalPlayer.PlayerGui.CandyCount:FindFirstChild("ImageLabel")
