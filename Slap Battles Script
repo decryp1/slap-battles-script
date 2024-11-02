@@ -1,30 +1,34 @@
--- loadstring for all you mobile users loadstring(game:HttpGet('https://pastebin.com/anuVuXjv'))()
--- made with ChatGPT 4-0, for testing purposes
--- somehow this is better than any other script for this game i've seen so far
--- Kavo UI Library setup
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("Slap Battles Script by d3cryptt! (best sb script ever!)", "Ocean")
+-- Load Sirius Rayfield UI Library
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- Slap Aura Section
-local SlapAuraTab = Window:NewTab("Slap Aura")
-local SlapAuraSection = SlapAuraTab:NewSection("Slap Aura")
-local SlapAuraSection = SlapAuraTab:NewSection("good alt got banned, use my video for a tutorial!")
--- Variables
+-- Create the UI window
+local Window = Rayfield:CreateWindow({
+    Name = "Slap Battles Script by d3cryptt! (best sb script ever!)",
+    LoadingTitle = "Loading Slap Battles Script...",
+    LoadingSubtitle = "Created by d3cryptt",
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = nil,
+        FileName = "SlapBattlesUI"
+    }
+})
+
+-- Slap Aura Tab
+local SlapAuraTab = Window:CreateTab("Slap Aura", 4483362458)
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
-local slapDistance = 100
-local slapCooldown = 0.585
+local slapCooldown = 0.6
 local lastSlapTime = 0
 local slapEnabled = false
-local selectedRemote = "b" -- Default remote
+local selectedRemote = "PlagueHit"
 
--- Function to slap the closest player within the slap distance
+-- Function to slap the closest player within the default slap distance
 local function slapClosestPlayer()
-    if not slapEnabled then return end -- only do the rest if the slap aura is set to true
+    if not slapEnabled then return end
 
     local closestPlayer = nil
-    local closestDistance = slapDistance
+    local closestDistance = 100  -- Default slap distance
 
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local playerPosition = player.Character.HumanoidRootPart.Position
@@ -42,20 +46,21 @@ local function slapClosestPlayer()
         end
 
         if closestPlayer and tick() - lastSlapTime >= slapCooldown then
-            lastSlapTime = tick() -- Update last slap time
+            lastSlapTime = tick()
             if closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
                 local head = closestPlayer.Character.Head
                 local args = {head}
                 local remote = ReplicatedStorage:FindFirstChild(selectedRemote)
                 if remote then
                     remote:FireServer(unpack(args))
+                else
+                    warn("Remote not found:", selectedRemote)
                 end
             end
         end
     end
 end
 
--- Dropdown menu for glove selection
 local gloveList = {
     {"Default", "b"},
     {"Dual", "GeneralHit"},
@@ -96,7 +101,7 @@ local gloveList = {
     {"Shukuchi", "ShukuchiHit"},
     {"Duelist", "DuelistHit"},
     {"Woah", "woahHit"},
-    {"Ice (fixed as of 10/29/24 <3)", "IceHit"},
+    {"Ice", "IceHit"},
     {"Gummy", "GeneralHit"},
     {"Adios", "hitAdios"},
     {"Blocked", "BlockedHit"},
@@ -152,10 +157,10 @@ local gloveList = {
     {"Roguelike", "GeneralHit"},
     {"Barrel", "GeneralHit"},
     {"Lawnmower", "GeneralHit"},
-    {"God's Hand (not supported!)", "not supported"},
+    {"God's Hand", "not supported"},
     {"The Flex", "FlexHit"},
     {"Overkill", "Overkillhit"},
-    {"CUSTOM (might be broken?)", "CustomHit"},
+    {"CUSTOM", "CustomHit"},
     {"CULT", "CULTHit"},
     {"Plague", "PlagueHit"},
     {"Leash", "GeneralHit"},
@@ -163,7 +168,7 @@ local gloveList = {
     {"buddies", "buddiesHIT"},
     {"Tycoon", "GeneralHit"},
     {"Orbit", "Orbihit"},
-    {"Avatar (works for Avatar and the Normal Glove", "GeneralHit"},
+    {"Avatar", "GeneralHit"},
     {"Frostbite", "GeneralHit"}
 }
 
@@ -172,44 +177,59 @@ for _, glove in ipairs(gloveList) do
     table.insert(gloveNames, glove[1])
 end
 
-SlapAuraSection:NewDropdown("Select Glove", "Choose a glove to set the remote", gloveNames, function(selected)
-    for _, glove in ipairs(gloveList) do
-        if glove[1] == selected then
-            selectedRemote = glove[2]
-            break
+SlapAuraTab:CreateDropdown({
+    Name = "Select Glove",
+    Options = gloveNames,
+    CurrentOption = "Plague",
+    MultipleOptions = false,
+    Flag = "GloveDropdown",
+    Callback = function(selectedOption)
+        for _, glove in ipairs(gloveList) do
+            if glove[1] == selectedOption then
+                selectedRemote = glove[2]
+                print("Selected Remote:", selectedRemote)
+                break
+            end
         end
     end
-end)
+})
 
+SlapAuraTab:CreateToggle({
+    Name = "Enable Slap Aura",
+    CurrentValue = false,
+    Flag = "SlapAuraToggle",
+    Callback = function(state)
+        slapEnabled = state
+        print("Slap Aura enabled:", slapEnabled)
+    end
+})
 
-SlapAuraSection:NewToggle("Enable Slap Aura", "Toggle the Slap Aura on/off", function(state)
-    slapEnabled = state
-end)
-
-SlapAuraSection:NewSlider("random slider", "Set the distance for the Slap Aura", 50, 1, slapDistance, function(value)
-    slapDistance = value
-end)
-
-SlapAuraSection:NewButton("Tp to Arena, (god mode) (USE IN THE LOBBY!!)", "Makes you tp to the Arena", function()
+SlapAuraTab:CreateButton({
+    Name = "Tp to Arena (god mode)",
+    Callback = function()
         local player = game.Players.LocalPlayer.Character
-local part = workspace.Arena["main island"].Grass 
-player.HumanoidRootPart.CFrame = part.CFrame
-    end)
+        local part = workspace.Arena["main island"].Grass
+        player.HumanoidRootPart.CFrame = part.CFrame
+    end
+})
 
 local RunService = game:GetService("RunService")
-
 RunService.RenderStepped:Connect(function()
     if slapEnabled then
         slapClosestPlayer()
     end
 end)
 
-local SlappleFarmTab = Window:NewTab("Slapple Farm")
-local SlappleFarmSection = SlappleFarmTab:NewSection("farm slapples")
+local SlappleFarmTab = Window:CreateTab("Slapple Farm", 4483362458)
 
-SlappleFarmSection:NewToggle("Enable Slapple Farm", "Toggle the Slapple Farm on/off", function(state)
-    slappleFarmEnabled = state
-end)
+SlappleFarmTab:CreateToggle({
+    Name = "Enable Slapple Farm",
+    CurrentValue = false,
+    Flag = "SlappleFarmToggle",
+    Callback = function(state)
+        slappleFarmEnabled = state
+    end
+})
 
 local function farmSlapples()
     local slappleContainer = workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples")
@@ -235,124 +255,121 @@ local function onUpdate()
     end
 end
 
-
--- continuous check for slapples
 RunService.RenderStepped:Connect(onUpdate)
 
-SlappleFarmSection:NewButton("Grab slapples and serverhop (put in autoexec)", "grabs any slapples and serverhops to different slapples", function(state)
-    local player = game.Players.LocalPlayer
-local teleportService = game:GetService("TeleportService")
-local httpService = game:GetService("HttpService")
-local placeId, jobId = game.PlaceId, game.JobId
+SlappleFarmTab:CreateButton({
+    Name = "Grab slapples and serverhop (put in autoexec)",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local teleportService = game:GetService("TeleportService")
+        local httpService = game:GetService("HttpService")
+        local placeId, jobId = game.PlaceId, game.JobId
 
--- wait until the player is loaded enough to start the farm
-repeat wait() until player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-repeat wait() until workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("Teleport1") and workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples")
+        repeat wait() until player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        repeat wait() until workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("Teleport1") and workspace:FindFirstChild("Arena") and workspace.Arena:FindFirstChild("island5") and workspace.Arena.island5:FindFirstChild("Slapples")
 
-local function teleportToArena()
-    local teleportTouch = workspace.Lobby.Teleport1:FindFirstChild("TouchInterest")
-    if teleportTouch then
-        firetouchinterest(player.Character.HumanoidRootPart, workspace.Lobby.Teleport1, 0)
-        firetouchinterest(player.Character.HumanoidRootPart, workspace.Lobby.Teleport1, 1)
-    end
-end
-
-local function farmSlapples()
-    local slappleContainer = workspace.Arena.island5.Slapples
-    local slapplesPresent = false
-
-    for _, slapple in ipairs(slappleContainer:GetChildren()) do
-        if slapple:IsA("Model") and slapple:FindFirstChild("Glove") then
-            local glove = slapple.Glove
-            if glove:FindFirstChild("TouchInterest") then
-                firetouchinterest(player.Character.HumanoidRootPart, glove, 0)
-                firetouchinterest(player.Character.HumanoidRootPart, glove, 1)
-                slapplesPresent = true -- At least one slapple was present
+        local function teleportToArena()
+            local teleportTouch = workspace.Lobby.Teleport1:FindFirstChild("TouchInterest")
+            if teleportTouch then
+                firetouchinterest(player.Character.HumanoidRootPart, workspace.Lobby.Teleport1, 0)
+                firetouchinterest(player.Character.HumanoidRootPart, workspace.Lobby.Teleport1, 1)
             end
         end
-    end
-    return slapplesPresent
-end
 
-local function serverHop()
-    local httpRequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
-    if httpRequest then
-        local servers = {}
-        local req = httpRequest({
-            Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true", placeId)
-        })
-        local body = httpService:JSONDecode(req.Body)
+        local function farmSlapples()
+            local slappleContainer = workspace.Arena.island5.Slapples
+            local slapplesPresent = false
 
-        if body and body.data then
-            for _, server in ipairs(body.data) do
-                if type(server) == "table" and tonumber(server.playing) and tonumber(server.maxPlayers) and server.playing < server.maxPlayers and server.id ~= jobId then
-                    table.insert(servers, server.id)
+            for _, slapple in ipairs(slappleContainer:GetChildren()) do
+                if slapple:IsA("Model") and slapple:FindFirstChild("Glove") then
+                    local glove = slapple.Glove
+                    if glove:FindFirstChild("TouchInterest") then
+                        firetouchinterest(player.Character.HumanoidRootPart, glove, 0)
+                        firetouchinterest(player.Character.HumanoidRootPart, glove, 1)
+                        slapplesPresent = true
+                    end
                 end
             end
+            return slapplesPresent
         end
 
-        if #servers > 0 then
-            teleportService:TeleportToPlaceInstance(placeId, servers[math.random(1, #servers)], player)
-        else
-            warn("Serverhop: Couldn't find a server.")
+        local function serverHop()
+            local httpRequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+            if httpRequest then
+                local servers = {}
+                local req = httpRequest({
+                    Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true", placeId)
+                })
+                local body = httpService:JSONDecode(req.Body)
+
+                if body and body.data then
+                    for _, server in ipairs(body.data) do
+                        if type(server) == "table" and tonumber(server.playing) and tonumber(server.maxPlayers) and server.playing < server.maxPlayers and server.id ~= jobId then
+                            table.insert(servers, server.id)
+                        end
+                    end
+                end
+
+                if #servers > 0 then
+                    teleportService:TeleportToPlaceInstance(placeId, servers[math.random(1, #servers)], player)
+                else
+                    warn("Serverhop: Couldn't find a server.")
+                end
+            else
+                warn("Incompatible Exploit: Your exploit does not support this serverhop script (missing request)")
+            end
         end
-    else
-        warn("Incompatible Exploit: Your exploit does not support this serverhop script (missing request)")
+
+        while true do
+            teleportToArena()
+            wait(1)
+
+            local slapplesFound
+            repeat
+                slapplesFound = farmSlapples()
+                wait(0.1)
+            until not slapplesFound
+
+            serverHop()
+            wait(5)
+        end
     end
-end
+})
 
---loop to teleport to arena, farm slapples, and server hop
-while true do
-    -- Step 1: Teleport to Arena
-    teleportToArena()
-    wait(1) -- Give time for the teleport to complete
-
-    -- Step 2: Farm slapples continuously until none are left
-    local slapplesFound
-    repeat
-        slapplesFound = farmSlapples()
-        wait(0.1) -- Small delay before checking for slapples again
-    until not slapplesFound -- Continue farming until no slapples are left
-
-    -- Step 3: Server hop when all slapples in the server are collected
-    serverHop()
-    wait(5) -- Wait to ensure teleport before resuming
-end
-
-end)
-
-local AntiFallTab = Window:NewTab("Anti Fall")
-local AntiFallSection = AntiFallTab:NewSection("Anti Fall")
+local AntiFallTab = Window:CreateTab("Anti Fall", 4483362458)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-
 local player = Players.LocalPlayer
+
 local teleportCFrame = CFrame.new(-6.73902416, -5.20054817, 1.95076489, -0.136649311, -0.00766478525, -0.990589857, -0.000125628911, 0.999970198, -0.00772003829, 0.99061954, -0.000930505106, -0.136646196)
 local fallProtectionEnabled = false
 
 local function checkFall()
     if fallProtectionEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local yPosition = player.Character.HumanoidRootPart.Position.Y
-        if yPosition < -10 then -- Set the threshold Y value as needed
+        if yPosition < -10 then
             player.Character:SetPrimaryPartCFrame(teleportCFrame)
         end
     end
 end
 
-AntiFallSection:NewToggle("Teleport Anti Fall", "Toggle the Anti Fall protection on/off", function(state)
-    fallProtectionEnabled = state
-end)
+AntiFallTab:CreateToggle({
+    Name = "Teleport Anti Fall",
+    CurrentValue = false,
+    Flag = "TeleportAntiFallToggle",
+    Callback = function(state)
+        fallProtectionEnabled = state
+    end
+})
 
--- check for whenever the player falls 
 RunService.Heartbeat:Connect(checkFall)
 
 local originalCFrame = CFrame.new(-4.08799744, -8.92285156, 1.83599997) * CFrame.Angles(0, 0, math.rad(0.06))
-local platformSize = Vector3.new(3000, 1, 3000) -- Flat, 1 stud high
+local platformSize = Vector3.new(3000, 1, 3000)
 local platform
 local isPlatformVisible = false
 
--- Function to create the invisible part
 local function createPlatform()
     if not platform then
         platform = Instance.new("Part")
@@ -360,7 +377,7 @@ local function createPlatform()
         platform.CFrame = originalCFrame
         platform.Anchored = true
         platform.CanCollide = true
-        platform.Transparency = 0.8 -- Invisible
+        platform.Transparency = 0.8
         platform.Parent = workspace
     end
     platform.Parent = workspace
@@ -381,49 +398,53 @@ local function togglePlatform()
     isPlatformVisible = not isPlatformVisible
 end
 
-
-AntiFallSection:NewToggle("Invisible Floor Anti Fall", "Toggle the invisible platform", function(state)
-    togglePlatform()
-end)
-
-AntiFallSection:NewButton("Delete Void/Death Barriers (not lobby)", "Deletes all specified barriers and touch interests", function()
-    local partsToDelete = {
-        workspace:FindFirstChild("DEATHBARRIER"),
-        workspace:FindFirstChild("DEATHBARRIER2"),
-        workspace:FindFirstChild("ArenaBarrier"),
-        workspace:FindFirstChild("dedBarrier"),
-        workspace:FindFirstChild("AntiDefaultArena")
-    }
-    
-    for _, part in ipairs(partsToDelete) do
-        if part then
-            part:Destroy()
-        end
+AntiFallTab:CreateToggle({
+    Name = "Invisible Floor Anti Fall",
+    CurrentValue = false,
+    Flag = "InvisibleFloorToggle",
+    Callback = function(state)
+        togglePlatform()
     end
+})
 
-    local lobbyFrame = workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("LobbyFrame")
-    if lobbyFrame then
-        for _, descendant in ipairs(lobbyFrame:GetDescendants()) do
-            if descendant:IsA("TouchTransmitter") then
-                descendant:Destroy()
+AntiFallTab:CreateButton({
+    Name = "Delete Void/Death Barriers (not lobby)",
+    Callback = function()
+        local partsToDelete = {
+            workspace:FindFirstChild("DEATHBARRIER"),
+            workspace:FindFirstChild("DEATHBARRIER2"),
+            workspace:FindFirstChild("ArenaBarrier"),
+            workspace:FindFirstChild("dedBarrier"),
+            workspace:FindFirstChild("AntiDefaultArena")
+        }
+        
+        for _, part in ipairs(partsToDelete) do
+            if part then
+                part:Destroy()
+            end
+        end
+
+        local lobbyFrame = workspace:FindFirstChild("Lobby") and workspace.Lobby:FindFirstChild("LobbyFrame")
+        if lobbyFrame then
+            for _, descendant in ipairs(lobbyFrame:GetDescendants()) do
+                if descendant:IsA("TouchTransmitter") then
+                    descendant:Destroy()
+                end
             end
         end
     end
-end)
+})
 
-local PlayerTab = Window:NewTab("Player")
-local PlayerSection = PlayerTab:NewSection("Player")
-local PlayerSection = PlayerTab:NewSection("speed and jump sometimes breaks, use infinite yield")
+local PlayerTab = Window:CreateTab("Player", 4483362458)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
-local player = game.Players.LocalPlayer
-local hrp = nil -- HumanoidRootPart reference (updated on respawn)
-local toggle = false -- Initial state for toggle
-local slappedPlayers = {} -- Table to store recently slapped players
+local hrp = nil
+local toggle = false
+local slappedPlayers = {}
 
 player.CharacterAdded:Connect(function(character)
     hrp = character:WaitForChild("HumanoidRootPart")
@@ -433,9 +454,14 @@ if player.Character then
     hrp = player.Character:FindFirstChild("HumanoidRootPart")
 end
 
-PlayerSection:NewToggle("Autofarm Toggle", "Toggle autofarming on/off", function(state)
-    toggle = state
-end)
+PlayerTab:CreateToggle({
+    Name = "Autofarm Toggle",
+    CurrentValue = false,
+    Flag = "AutofarmToggle",
+    Callback = function(state)
+        toggle = state
+    end
+})
 
 function findClosestTarget()
     local closestTarget = nil
@@ -462,22 +488,20 @@ spawn(function()
             local target = findClosestTarget()
             if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
                 local startTime = tick()
-                
-                -- continuous teleportation loop with a controlled delay
+
                 while toggle and (tick() - startTime < 0.6) do
                     hrp.CFrame = CFrame.new(target.Character.HumanoidRootPart.Position - Vector3.new(0, 10, 0))
-                    wait(0.05) -- Slight delay to avoid resource overload
+                    wait(0.05)
                 end
-                
-                -- mark target as slapped and set cooldown
+
                 slappedPlayers[target.Name] = true
                 spawn(function()
-                    wait(1) -- 1-second cooldown before allowing to target again
+                    wait(1)
                     slappedPlayers[target.Name] = nil
                 end)
             end
         else
-            wait(0.1) 
+            wait(0.1)
         end
     end
 end)
@@ -492,39 +516,53 @@ local function JumpPowerChange(power)
     humanoid.JumpPower = power
 end
 
-PlayerSection:NewSlider("Walk Speed", "Adjusts your walk speed", 150, 16, function(value)
-    local speed = value
-    if isnumber(speed) then
-        WalkSpeedChange(speed)
-        HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-            WalkSpeedChange(speed)
-        end)
-        HumanModCons.wsCA = (HumanModCons.wsCA and HumanModCons.wsCA:Disconnect() and false) or player.CharacterAdded:Connect(function(nChar)
-            character, humanoid = nChar, nChar:WaitForChild("Humanoid")
+PlayerTab:CreateSlider({
+    Name = "Walk Speed",
+    Range = {16, 150},
+    Increment = 1,
+    CurrentValue = 16,
+    Flag = "WalkSpeedSlider",
+    Callback = function(value)
+        local speed = value
+        if isnumber(speed) then
             WalkSpeedChange(speed)
             HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
                 WalkSpeedChange(speed)
             end)
-        end)
+            HumanModCons.wsCA = (HumanModCons.wsCA and HumanModCons.wsCA:Disconnect() and false) or player.CharacterAdded:Connect(function(nChar)
+                character, humanoid = nChar, nChar:WaitForChild("Humanoid")
+                WalkSpeedChange(speed)
+                HumanModCons.wsLoop = (HumanModCons.wsLoop and HumanModCons.wsLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+                    WalkSpeedChange(speed)
+                end)
+            end)
+        end
     end
-end)
+})
 
-PlayerSection:NewSlider("Jump Power", "Adjusts your jump power", 150, 50, function(value)
-    local power = value
-    if isnumber(power) then
-        JumpPowerChange(power)
-        HumanModCons.jpLoop = (HumanModCons.jpLoop and HumanModCons.jpLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("JumpPower"):Connect(function()
-            JumpPowerChange(power)
-        end)
-        HumanModCons.jpCA = (HumanModCons.jpCA and HumanModCons.jpCA:Disconnect() and false) or player.CharacterAdded:Connect(function(nChar)
-            character, humanoid = nChar, nChar:WaitForChild("Humanoid")
+PlayerTab:CreateSlider({
+    Name = "Jump Power",
+    Range = {50, 150},
+    Increment = 1,
+    CurrentValue = 50,
+    Flag = "JumpPowerSlider",
+    Callback = function(value)
+        local power = value
+        if isnumber(power) then
             JumpPowerChange(power)
             HumanModCons.jpLoop = (HumanModCons.jpLoop and HumanModCons.jpLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("JumpPower"):Connect(function()
                 JumpPowerChange(power)
             end)
-        end)
+            HumanModCons.jpCA = (HumanModCons.jpCA and HumanModCons.jpCA:Disconnect() and false) or player.CharacterAdded:Connect(function(nChar)
+                character, humanoid = nChar, nChar:WaitForChild("Humanoid")
+                JumpPowerChange(power)
+                HumanModCons.jpLoop = (HumanModCons.jpLoop and HumanModCons.jpLoop:Disconnect() and false) or humanoid:GetPropertyChangedSignal("JumpPower"):Connect(function()
+                    JumpPowerChange(power)
+                end)
+            end)
+        end
     end
-end)
+})
 
 Players.PlayerRemoving:Connect(function(removingPlayer)
     if removingPlayer == player then
@@ -539,122 +577,142 @@ function isnumber(value)
     return type(value) == "number"
 end
 
-local extrashitTab = Window:NewTab("extra stuff")
-local extrashitSection = extrashitTab:NewSection("some cool useful stuff")
+local extrashitTab = Window:CreateTab("extra stuff", 4483362458)
 
-extrashitSection:NewToggle("Auto Click Tycoon BROKEN", "Automatically clicks the Tycoon button", function(Value)
-    AutoTycoon = Value
-    for i,v in pairs(workspace:GetDescendants()) do
-        if v.Name == "End" and v.ClassName == "Part" then
-            v.Size = Vector3.new(28, 0.3, 4)
-        end
-    end
-    while AutoTycoon do
-        for i,v in pairs(workspace:GetDescendants()) do
-            if v.Name == "Click" and v:FindFirstChild("ClickDetector") then
-                fireclickdetector(v.ClickDetector)
+extrashitTab:CreateToggle({
+    Name = "Auto Click Tycoon BROKEN",
+    CurrentValue = false,
+    Flag = "AutoTycoonToggle",
+    Callback = function(Value)
+        AutoTycoon = Value
+        for i, v in pairs(workspace:GetDescendants()) do
+            if v.Name == "End" and v.ClassName == "Part" then
+                v.Size = Vector3.new(28, 0.3, 4)
             end
         end
-        task.wait()
-    end
-end)
-
-
-extrashitSection:NewButton("Remove reaper slap effect (use after they slap you)", "ButtonInfo", function()
-    for i = 1, 20 do
-        game:GetService("ReplicatedStorage"):WaitForChild("HumanoidDied"):FireServer(x, false)
-    end
-    for i, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-        if v.Name == "DeathMark" then
-            game.ReplicatedStorage.ReaperGone:FireServer(v)
-            game:GetService("Lighting"):WaitForChild("DeathMarkColorCorrection"):Destroy()
+        while AutoTycoon do
+            for i, v in pairs(workspace:GetDescendants()) do
+                if v.Name == "Click" and v:FindFirstChild("ClickDetector") then
+                    fireclickdetector(v.ClickDetector)
+                end
+            end
+            task.wait()
         end
     end
-end)
+})
 
-extrashitSection:NewToggle("Rhythm Explosion Spam BROKEN", "Toggles the rhythm explosion spam", function(state)
-    RhythmSpam = state
-    while RhythmSpam do
-        game:GetService("ReplicatedStorage").rhythmevent:FireServer("AoeExplosion", 0)
-        task.wait()
-    end
-end)
-
-extrashitSection:NewToggle("Null Ability BROKEN", "Toggles the Null ability loop", function(state)
-    NullSpam = state
-    while NullSpam do
-        game:GetService("ReplicatedStorage").NullAbility:FireServer()
-        task.wait()
-    end
-end)
-
-extrashitSection:NewButton("Infinite Yield", "gives you admin commands", function()
- loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-end)
-
-
-extrashitSection:NewButton("Remote Spy", "gives you a remote spyer", function()
- loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
-end)
-
-extrashitSection:NewButton("Dex Explorer", "gives you dex explorer", function()
- loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
-end)
-
-local BadgesTab = Window:NewTab("Badges")
-local BadgesSection = BadgesTab:NewSection("Badges")
-
-BadgesSection:NewButton("Get Elude", "Teleport to Elude Maze", function()
-    local teleportFunc = queueonteleport or queue_on_teleport
-    if teleportFunc then
-        teleportFunc([[
-            if not game:IsLoaded() then
-                game.Loaded:Wait()
+extrashitTab:CreateButton({
+    Name = "Remove reaper slap effect (use after they slap you)",
+    Callback = function()
+        for i = 1, 20 do
+            game:GetService("ReplicatedStorage"):WaitForChild("HumanoidDied"):FireServer(x, false)
+        end
+        for i, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+            if v.Name == "DeathMark" then
+                game.ReplicatedStorage.ReaperGone:FireServer(v)
+                game:GetService("Lighting"):WaitForChild("DeathMarkColorCorrection"):Destroy()
             end
-            repeat wait() until game.Players.LocalPlayer
-            game:GetService("RunService").RenderStepped:Connect(function()
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-502.336, 14.228, -179.597)
-            end)
-            game:GetService("TeleportService"):Teleport(6403373529)
-        ]])
+        end
     end
-    game:GetService("TeleportService"):Teleport(11828384869)
-end)
+})
 
-BadgesSection:NewButton("Get Chain (1k slaps)", "Teleport and solve puzzle", function()
-    if game.Players.LocalPlayer.leaderstats.Slaps.Value >= 1000 then
+extrashitTab:CreateToggle({
+    Name = "Rhythm Explosion Spam BROKEN",
+    CurrentValue = false,
+    Flag = "RhythmSpamToggle",
+    Callback = function(state)
+        RhythmSpam = state
+        while RhythmSpam do
+            game:GetService("ReplicatedStorage").rhythmevent:FireServer("AoeExplosion", 0)
+            task.wait()
+        end
+    end
+})
+
+extrashitTab:CreateToggle({
+    Name = "Null Ability BROKEN",
+    CurrentValue = false,
+    Flag = "NullAbilityToggle",
+    Callback = function(state)
+        NullSpam = state
+        while NullSpam do
+            game:GetService("ReplicatedStorage").NullAbility:FireServer()
+            task.wait()
+        end
+    end
+})
+
+extrashitTab:CreateButton({
+    Name = "Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end
+})
+
+extrashitTab:CreateButton({
+    Name = "Remote Spy",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
+    end
+})
+
+extrashitTab:CreateButton({
+    Name = "Dex Explorer",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+    end
+})
+
+local BadgesTab = Window:CreateTab("Badges", 4483362458)
+
+BadgesTab:CreateButton({
+    Name = "Clock Badge Script",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/f0cell/sbsbsbs/refs/heads/main/clock%20badge%20script"))()
+    end
+})
+
+
+BadgesTab:CreateButton({
+    Name = "Get Elude",
+    Callback = function()
         local teleportFunc = queueonteleport or queue_on_teleport
         if teleportFunc then
-            teleportFunc([[
-                if not game:IsLoaded() then
-                    game.Loaded:Wait()
-                end
-                repeat wait() until game.Players.LocalPlayer
-                repeat wait() until game.Workspace:FindFirstChild("Map"):FindFirstChild("CodeBrick")
-                if game.Workspace.Map.CodeBrick.SurfaceGui:FindFirstChild("IMGTemplate") then
-                    game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "1st"
-                    game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "2nd"
-                    game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "3rd"
-                    game.Workspace.Map.CodeBrick.SurfaceGui.IMGTemplate.Name = "4th"
-                end
-                -- Your logic for setting first, seconds, third, and fourth variables
-                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons.Reset.ClickDetector)
-                wait(0.25)
-                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[first].ClickDetector)
-                wait(0.25)
-                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[seconds].ClickDetector)
-                wait(0.25)
-                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[third].ClickDetector)
-                wait(0.25)
-                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons[fourth].ClickDetector)
-                wait(0.25)
-                fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons.Enter.ClickDetector)
+            teleportFunc([[ 
+                if not game:IsLoaded() then 
+                    game.Loaded:Wait() 
+                end 
+                repeat wait() until game.Players.LocalPlayer 
+                game:GetService("RunService").RenderStepped:Connect(function() 
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-502.336, 14.228, -179.597) 
+                end) 
                 game:GetService("TeleportService"):Teleport(6403373529)
             ]])
         end
-        game:GetService("TeleportService"):Teleport(9431156611)
+        game:GetService("TeleportService"):Teleport(11828384869)
     end
-end)
+})
+
+BadgesTab:CreateButton({
+    Name = "Get Chain (1k slaps)",
+    Callback = function()
+        if game.Players.LocalPlayer.leaderstats.Slaps.Value >= 1000 then
+            local teleportFunc = queueonteleport or queue_on_teleport
+            if teleportFunc then
+                teleportFunc([[
+                    if not game:IsLoaded() then 
+                        game.Loaded:Wait() 
+                    end 
+                    repeat wait() until game.Players.LocalPlayer
+                    -- Solve puzzle sequence here
+                    fireclickdetector(game.Workspace.Map.OriginOffice.Door.Keypad.Buttons.Enter.ClickDetector)
+                    game:GetService("TeleportService"):Teleport(6403373529)
+                ]])
+            end
+            game:GetService("TeleportService"):Teleport(9431156611)
+        end
+    end
+})
 
 local teleporting = false
 local function teleport()
@@ -666,210 +724,218 @@ local function teleport()
     end
 end
 
-local BadgesSection = BadgesTab:NewSection("use Slapple Farm for Slapple Badge")
-
-BadgesSection:NewToggle("Get Tycoon (tip: use extended, slap aura, and ;walkfling", "Teleports to the plate every 0.1 secondss", function(state)
-    teleporting = state
-    if state then
-        teleport()
-    end
-end)
-
-BadgesSection:NewButton("Get [REDACTED] (5k slaps)", "Get the [REDACTED] badge", function()
-    if game.Players.LocalPlayer.leaderstats.Slaps.Value >= 5000 then
-        Door = 0
-        for i = 1, 10 do
-            Door = Door + 1
-            if not game:GetService("BadgeService"):UserHasBadgeAsync(game.Players.LocalPlayer.UserId, 2124847850) then
-                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), workspace.PocketDimension.Doors[Door], 0)
-                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), workspace.PocketDimension.Doors[Door], 1)
-                wait(3.75)
-            end
+BadgesTab:CreateToggle({
+    Name = "Get Tycoon (tip: use extended, slap aura, and ;walkfling",
+    CurrentValue = false,
+    Flag = "TeleportToPlate",
+    Callback = function(state)
+        teleporting = state
+        if state then
+            teleport()
         end
-    else
-        print ("you so stupid brah")
     end
-end)
+})
 
-BadgesSection:NewToggle("Auto Collect Jet Orbs", "Auto-collect Jet Orbs", function(Value)
-    Jetfarm = Value
-    while Jetfarm do
-        for _, v in pairs(game.Workspace:GetChildren()) do
-            if v.Name == "JetOrb" and v:FindFirstChild("TouchInterest") then
-                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 0)
-                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 1)
+BadgesTab:CreateButton({
+    Name = "Get [REDACTED] (5k slaps)",
+    Callback = function()
+        if game.Players.LocalPlayer.leaderstats.Slaps.Value >= 5000 then
+            for Door = 1, 10 do
+                if not game:GetService("BadgeService"):UserHasBadgeAsync(game.Players.LocalPlayer.UserId, 2124847850) then
+                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), workspace.PocketDimension.Doors[Door], 0)
+                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), workspace.PocketDimension.Doors[Door], 1)
+                    wait(3.75)
+                end
             end
+        else
+            print("You need more slaps to access this.")
         end
-        task.wait()
     end
-end)
+})
 
+BadgesTab:CreateToggle({
+    Name = "Auto Collect Jet Orbs",
+    CurrentValue = false,
+    Flag = "JetOrbsAutoCollect",
+    Callback = function(Value)
+        Jetfarm = Value
+        while Jetfarm do
+            for _, v in pairs(game.Workspace:GetChildren()) do
+                if v.Name == "JetOrb" and v:FindFirstChild("TouchInterest") then
+                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 0)
+                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 1)
+                end
+            end
+            task.wait()
+        end
+    end
+})
 
-BadgesSection:NewButton("Teleport to Staff Application Room (Admin Glove)", "Badge", function()
+BadgesTab:CreateButton({
+    Name = "Teleport to Staff Application Room (Admin Glove)",
+    Callback = function()
         if game:GetService("ReplicatedStorage").Assets.Retro.Map then
-    game.ReplicatedStorage.Assets.Retro.Map.Parent = workspace
-    wait(0.4)
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-16971.7168, 797.600342, 4905.17334, 0.230043754, -4.14069206e-08, 0.973180294, -1.62095546e-08, 1, 4.63797178e-08, -0.973180294, -2.64441837e-08, 0.230043754)
-    wait(0.4)
-    fireclickdetector(workspace.Map.RetroObbyMap:GetChildren()[5].StaffApp.Button.ClickDetector)
-    else
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-16971.7168, 797.600342, 4905.17334, 0.230043754, -4.14069206e-08, 0.973180294, -1.62095546e-08, 1, 4.63797178e-08, -0.973180294, -2.64441837e-08, 0.230043754)
-    wait(0.4)
-    fireclickdetector(workspace.Map.RetroObbyMap:GetChildren()[5].StaffApp.Button.ClickDetector)
+            game.ReplicatedStorage.Assets.Retro.Map.Parent = workspace
+            wait(0.4)
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-16971.7168, 797.600342, 4905.17334)
+            wait(0.4)
+            fireclickdetector(workspace.Map.RetroObbyMap:GetChildren()[5].StaffApp.Button.ClickDetector)
+        else
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-16971.7168, 797.600342, 4905.17334)
+            wait(0.4)
+            fireclickdetector(workspace.Map.RetroObbyMap:GetChildren()[5].StaffApp.Button.ClickDetector)
+        end
     end
-    end)
-    
- 
-    
-    BadgesSection:NewButton("Get Lamp Glove", "Need ZZZZZZZ Glove", function()
+})
+
+BadgesTab:CreateButton({
+    Name = "Get Lamp Glove",
+    Callback = function()
         if game.Players.LocalPlayer.leaderstats.Glove.Value == "ZZZZZZZ" then
-            for i = 1,5 do
+            for i = 1, 5 do
                 game:GetService("ReplicatedStorage").nightmare:FireServer("LightBroken")
             end
         else
-            game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Error",Text = "Need ZZZZZZZ Glove.",Icon = "rbxassetid://7733658504",Duration = 10})
+            game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "Need ZZZZZZZ Glove.", Duration = 10})
         end
-    end)
-    
-   
-    
-    BadgesSection:NewButton("Get Ice Skate Glove", "Badge", function()
-        local args = {
-        [1] = "Freeze"
-    }
-    
-    game:GetService("ReplicatedStorage").IceSkate:FireServer(unpack(args))
-    end)
-    
+    end
+})
 
-    BadgesSection:NewDropdown("Maze Badge", "Badge", {"Counter", "Elude"}, function(y)
+BadgesTab:CreateButton({
+    Name = "Get Ice Skate Glove",
+    Callback = function()
+        game:GetService("ReplicatedStorage").IceSkate:FireServer("Freeze")
+    end
+})
+
+BadgesTab:CreateDropdown({
+    Name = "Maze Badge",
+    Options = {"Counter", "Elude"},
+    CurrentOption = {"Counter"},
+    MultipleOptions = false,
+    Flag = "MazeBadgeDropdown",
+    Callback = function(y)
         if y == "Counter" then
-            local teleportFunc = queueonteleport or queue_on_teleport or syn and syn.queue_on_teleport
-    if teleportFunc then
-        teleportFunc([[
-            if not game:IsLoaded() then
-                game.Loaded:Wait()
+            local teleportFunc = queueonteleport or queue_on_teleport
+            if teleportFunc then
+                teleportFunc([[ 
+                    if not game:IsLoaded() then 
+                        game.Loaded:Wait() 
+                    end 
+                    repeat wait() until game.Players.LocalPlayer
+                    -- Maze logic here
+                ]])
             end
-            repeat wait() until game.Players.LocalPlayer
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-61.4113426, 4.67113781, -45.0443306, -0.0143145993, 0.00252397754, -0.999894321, -7.96703534e-06, 0.999996841, 0.00252435054, 0.99989748, 4.41164557e-05, -0.014314536)
-    wait(0.3)
-    fireclickdetector(game.Workspace.CounterLever.ClickDetector)
-    wait(1)
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(15.2456455, 4.49108553, -233.529053, -0.631848156, -0.00334048411, 0.775085032, -1.25992265e-05, 0.999990761, 0.00429952005, -0.775092185, 0.00270687975, -0.631842375)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 2 minutes to receive.",Icon = "rbxassetid://7733656100",Duration = 5})
-    wait(30)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes and 30 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 5})
-    wait(30)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 minutes to receive.",Icon = "rbxassetid://7733656100",Duration = 5})
-    wait(30)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 30 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 5})
-    wait(25)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 5 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 4 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 3 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 2 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    game:GetService("StarterGui"):SetCore("SendNotification",{Title = "Wait",Text = " 1 seconds to receive.",Icon = "rbxassetid://7733656100",Duration = 0.1})
-    wait(1)
-    for i,v in pairs(workspace.Maze:GetDescendants()) do
-    if v:IsA("ClickDetector") then
-    fireclickdetector(v)
-    end
-    end
-        ]])
-    end
-    game:GetService("TeleportService"):Teleport(11828384869)
-elseif y == "Elude" then
-    local teleportFunc = queueonteleport or queue_on_teleport or syn and syn.queue_on_teleport
-    if teleportFunc then
-        teleportFunc([[
-            if not game:IsLoaded() then
-                game.Loaded:Wait()
+            game:GetService("TeleportService"):Teleport(11828384869)
+        elseif y == "Elude" then
+            local teleportFunc = queueonteleport or queue_on_teleport
+            if teleportFunc then
+                teleportFunc([[ 
+                    if not game:IsLoaded() then 
+                        game.Loaded:Wait() 
+                    end 
+                    repeat wait() until game.Players.LocalPlayer
+                    -- Elude logic here
+                ]])
             end
-            repeat wait() until game.Players.LocalPlayer
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-193.290787, 7.39999914, -130.307114, 0.454088956, 1.82432505e-08, 0.890956342, -2.14201332e-08, 1, -9.55894652e-09, -0.890956342, -1.4743792e-08, 0.454088956)
-        wait(1)
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(84.8454437, 7.39999914, -201.827698, 0.694604456, -5.9176017e-08, 0.719391882, 4.9516661e-08, 1, 3.44478792e-08, -0.719391882, 1.16942349e-08, 0.694604456)
-        wait(1)
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(218.528198, 7.39999914, 83.4171371, 0.655885577, 5.49275381e-09, 0.754860282, -1.8204565e-08, 1, 8.54112692e-09, -0.754860282, -1.9343906e-08, 0.655885577)
-        wait(1)
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(104.568184, 10.5492659, 194.721115, 0.990249932, -0.136891961, 0.0258003082, -0.0024311184, 0.168200076, 0.9857499, -0.139280856, -0.976201475, 0.166227311)
-        wait(2)
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-502.335632, 14.2279472, -179.596512, 1, 0, 0, 0, -0.965929747, 0.258804798, 0, -0.258804798, -0.965929747)
-        ]])
-    end
-    game:GetService("TeleportService"):Teleport(11828384869)
-end
-end)
-
-BadgesSection:NewToggle("Auto Collect Phase Orbs", "Auto-collect Phase Orbs", function(Value)
-    Phasefarm = Value
-    while Phasefarm do
-        for _, v in pairs(game.Workspace:GetChildren()) do
-            if v.Name == "PhaseOrb" and v:FindFirstChild("TouchInterest") then
-                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 0)
-                firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 1)
-            end
+            game:GetService("TeleportService"):Teleport(11828384869)
         end
-        task.wait()
     end
-end)
+})
 
-BadgesSection:NewButton("Get Brazil Badge", "Get the Brazil badge", function()
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.workspace.Lobby.brazil.portal.CFrame
-end)
+BadgesTab:CreateToggle({
+    Name = "Auto Collect Phase Orbs",
+    CurrentValue = false,
+    Flag = "PhaseOrbsAutoCollect",
+    Callback = function(Value)
+        Phasefarm = Value
+        while Phasefarm do
+            for _, v in pairs(game.Workspace:GetChildren()) do
+                if v.Name == "PhaseOrb" and v:FindFirstChild("TouchInterest") then
+                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 0)
+                    firetouchinterest(game.Players.LocalPlayer.Character:WaitForChild("Head"), v, 1)
+                end
+            end
+            task.wait()
+        end
+    end
+})
 
-BadgesSection:NewButton("Get court evidence Badge", "Get the court evidence badge", function()
-    fireclickdetector(game.Workspace.Lobby.Scene.knofe.ClickDetector)
-end)
+BadgesTab:CreateButton({
+    Name = "Get Brazil Badge",
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.workspace.Lobby.brazil.portal.CFrame
+    end
+})
 
-BadgesSection:NewButton("Get duck Badge", "Get the duck badge", function()
-    fireclickdetector(game.Workspace.Arena["default island"]["Rubber Ducky"].ClickDetector)
-end)
+BadgesTab:CreateButton({
+    Name = "Get court evidence Badge",
+    Callback = function()
+        fireclickdetector(game.Workspace.Lobby.Scene.knofe.ClickDetector)
+    end
+})
 
-BadgesSection:NewButton("Get The Lone Orange Badge", "Get The Lone Orange badge", function()
-    fireclickdetector(game.Workspace.Arena.island5.Orange.ClickDetector)
-end)
+BadgesTab:CreateButton({
+    Name = "Get duck Badge",
+    Callback = function()
+        fireclickdetector(game.Workspace.Arena["default island"]["Rubber Ducky"].ClickDetector)
+    end
+})
 
-local uieditorTab = Window:NewTab("leaderboard")
-local uieditorSection = uieditorTab:NewSection("ALL OF THIS IS FAKE! ONLY YOU SEE IT!")
-local uieditorSection = uieditorTab:NewSection("only edits the leaderboard, troll your friends!")
+BadgesTab:CreateButton({
+    Name = "Get The Lone Orange Badge",
+    Callback = function()
+        fireclickdetector(game.Workspace.Arena.island5.Orange.ClickDetector)
+    end
+})
 
-uieditorSection:NewTextBox("edit slaps number", "Type the amount of slaps you want", function(value)
-    local slapsValue = tonumber(value)
-    if slapsValue then
-        local slaps = game:GetService("Players").LocalPlayer:FindFirstChild("leaderstats")
-                        and game.Players.LocalPlayer.leaderstats:FindFirstChild("Slaps")
+local uieditorTab = Window:CreateTab("leaderboard", 4483362458)
 
-        if slaps then
-            slaps.Value = slapsValue
+uieditorTab:CreateSection("ALL OF THIS IS FAKE! ONLY YOU SEE IT!")
+uieditorTab:CreateSection("only edits the leaderboard, troll your friends!")
+
+uieditorTab:CreateInput({
+    Name = "Edit Slaps Number",
+    PlaceholderText = "Type the amount of slaps you want",
+    Flag = "SlapsInput",
+    Callback = function(value)
+        local slapsValue = tonumber(value)
+        if slapsValue then
+            local slaps = game.Players.LocalPlayer:FindFirstChild("leaderstats")
+                          and game.Players.LocalPlayer.leaderstats:FindFirstChild("Slaps")
+            if slaps then
+                slaps.Value = slapsValue
+            else
+                warn("Can't find your slaps? Is your game loaded yet? Report this error to the discord!")
+            end
         else
-            warn("cant find your slaps? is your game loaded yet? report this error to the discord!")
+            warn("Enter a number, no letters, please!")
         end
-    else
-        warn("enter a number, no letters, please!")
     end
-end)
+})
 
-
-uieditorSection:NewTextBox("Edit Glove Name", "Type the glove value you want", function(value)
-    local glove = game:GetService("Players").LocalPlayer:FindFirstChild("leaderstats")
-                    and game.Players.LocalPlayer.leaderstats:FindFirstChild("Glove")
-    if glove then
-        glove.Value = value  
-    else
-        warn("Glove value not found in leaderstats.")
+uieditorTab:CreateInput({
+    Name = "Edit Glove Name",
+    PlaceholderText = "Type the glove value you want",
+    Flag = "GloveInput",
+    Callback = function(value)
+        local glove = game.Players.LocalPlayer:FindFirstChild("leaderstats")
+                     and game.Players.LocalPlayer.leaderstats:FindFirstChild("Glove")
+        if glove then
+            glove.Value = value
+        else
+            warn("Glove value not found in leaderstats.")
+        end
     end
-end)
-local ChangesTab = Window:NewTab("Change Logs")
-local ChangesSection = ChangesTab:NewSection("11/2/24: removed all halloween stuff :(")
-local ChangesSection = ChangesTab:NewSection("10/30/24: added a slapple serverhop farm (autoexecute)")
-local ChangesSection = ChangesTab:NewSection("10/30/24: unpatched candycorn farm")
-local ChangesSection = ChangesTab:NewSection("10/30/24: added a janky little autofarm that doesnt really work")
-local ChangesSection = ChangesTab:NewSection("10/30/24: added a candycorn editor to halloween section")
-local ChangesSection = ChangesTab:NewSection("10/30/24: made a leaderboard editor and uieditor section")
-local ChangesSection = ChangesTab:NewSection("10/30/24: added fallback support to regular gloves")
-local ChangesSection = ChangesTab:NewSection("10/30/24: Made Changes tab.")
+})
+
+local ChangesTab = Window:CreateTab("Change Logs", 4483362458)
+
+ChangesTab:CreateSection("11/2/24: removed all halloween stuff :(")
+ChangesTab:CreateSection("10/30/24: added a slapple serverhop farm (put in autoexecute!)")
+ChangesTab:CreateSection("10/30/24: unpatched candycorn farm")
+ChangesTab:CreateSection("10/30/24: added a janky little autofarm that doesn't really work")
+ChangesTab:CreateSection("10/30/24: added a candycorn editor to halloween section")
+ChangesTab:CreateSection("10/30/24: made a leaderboard editor and uieditor section")
+ChangesTab:CreateSection("10/30/24: added fallback support to regular gloves")
+ChangesTab:CreateSection("10/30/24: Made Changes tab.")
