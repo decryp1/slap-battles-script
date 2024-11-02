@@ -157,6 +157,7 @@ local gloveList = {
     {"Overkill", "Overkillhit"},
     {"CUSTOM (might be broken?)", "CustomHit"},
     {"CULT", "CULTHit"},
+    {"Plague", "PlagueHit"},
     {"Leash", "GeneralHit"},
     {"the schlob", "GeneralHit"},
     {"buddies", "buddiesHIT"},
@@ -863,105 +864,8 @@ uieditorSection:NewTextBox("Edit Glove Name", "Type the glove value you want", f
         warn("Glove value not found in leaderstats.")
     end
 end)
-
-local HalloweenTab = Window:NewTab("🎃🎃")
-local HalloweenSection = HalloweenTab:NewSection("spooky script")
-
-local player = game.Players.LocalPlayer
-local toggle = false -- Initial state for toggle
-
-HalloweenSection:NewToggle("Candycorn Farm v1 (fire touchinterests)", "Automatically touches all Candy Corns", function(state)
-    toggle = state
-end)
-function autoTouchCandyCorns()
-    while toggle do
-        for _, candyCorn in ipairs(workspace.CandyCorns:GetChildren()) do
-            if candyCorn:IsA("BasePart") and candyCorn:FindFirstChild("TouchInterest") then
-                firetouchinterest(player.Character.HumanoidRootPart, candyCorn, 0)
-                wait(0.01) -- Small delay to prevent overload
-                firetouchinterest(player.Character.HumanoidRootPart, candyCorn, 1)
-            end
-        end
-        wait(0.1)
-    end
-end
-
-spawn(function()
-    while true do
-        if toggle then
-            autoTouchCandyCorns()
-        else
-            wait(0.1)
-        end
-    end
-end)
-local toggle = false
-local originalSizes = {} -- this keeps track of the original sizes so that it can turn off easier
-
-HalloweenSection:NewToggle("Candycorn Farm v2 (makes them really big)", "Toggle size of all Candy Corns to 10000,10000,10000", function(state)
-    toggle = state
-    if not toggle then
-        -- reset the candycorn sizes to original when toggled off
-        for candyCorn, originalSize in pairs(originalSizes) do
-            if candyCorn and candyCorn:IsA("BasePart") then
-                candyCorn.Size = originalSize
-            end
-        end
-    end
-end)
-
--- Function to resize a Candy Corn part
-local function resizeCandyCorn(candyCorn)
-    if not originalSizes[candyCorn] then
-        originalSizes[candyCorn] = candyCorn.Size -- Store original size
-    end
-    candyCorn.Size = Vector3.new(10000, 10000, 10000) -- they patched the TouchInterest method, so i just found the next best way of farming
-end
-
--- check for new candycorns if any spawn, get collected, and if they should be collected
-workspace.CandyCorns.ChildAdded:Connect(function(candyCorn)
-    if toggle and candyCorn:IsA("BasePart") then
-        resizeCandyCorn(candyCorn)
-    end
-end)
-
-spawn(function()
-    while true do
-        if toggle then
-            for _, candyCorn in ipairs(workspace.CandyCorns:GetChildren()) do
-                if candyCorn:IsA("BasePart") and candyCorn.Size ~= Vector3.new(10000, 10000, 10000) then
-                    resizeCandyCorn(candyCorn)
-                end
-            end
-        end
-        wait(1)
-    end
-end)
-local HalloweenSection = HalloweenTab:NewSection("THE CANDYCORN EDITOR IS FAKE! (must be number)")
--- Create TextBox to enter the desired candy corn count
-HalloweenSection:NewTextBox("Candycorn Editor", "Type the amount you want", function(value)
-    -- Convert the entered value to a number
-    local candyCornCount = tonumber(value)
-
-    -- Ensure the value is a valid number
-    if candyCornCount then
-        -- this lets whatever you put in for your candycorn to also have a "/ 2000" in it, just so it looks legit
-        local textLabel = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
-                            and game.Players.LocalPlayer.PlayerGui:FindFirstChild("CandyCount")
-                            and game.Players.LocalPlayer.PlayerGui.CandyCount:FindFirstChild("ImageLabel")
-                            and game.Players.LocalPlayer.PlayerGui.CandyCount.ImageLabel:FindFirstChild("TextLabel")
-
-        if textLabel then
-            -- Display the text as "entered number / 2000"
-            textLabel.Text = tostring(candyCornCount) .. " / 2000"
-        else
-            warn("CandyCount TextLabel not found.")
-        end
-    else
-        warn("Please enter a valid number.")
-    end
-end)
 local ChangesTab = Window:NewTab("Change Logs")
+local ChangesSection = ChangesTab:NewSection("11/2/24: removed all halloween stuff :(")
 local ChangesSection = ChangesTab:NewSection("10/30/24: added a slapple serverhop farm (autoexecute)")
 local ChangesSection = ChangesTab:NewSection("10/30/24: unpatched candycorn farm")
 local ChangesSection = ChangesTab:NewSection("10/30/24: added a janky little autofarm that doesnt really work")
