@@ -21,45 +21,7 @@ local player = Players.LocalPlayer
 local slapCooldown = 0.6
 local lastSlapTime = 0
 local slapEnabled = false
-local selectedRemote = "PlagueHit"
-
--- Function to slap the closest player within the default slap distance
-local function slapClosestPlayer()
-    if not slapEnabled then return end
-
-    local closestPlayer = nil
-    local closestDistance = 100  -- Default slap distance
-
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local playerPosition = player.Character.HumanoidRootPart.Position
-
-        for _, otherPlayer in pairs(Players:GetPlayers()) do
-            if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                local otherPlayerPosition = otherPlayer.Character.HumanoidRootPart.Position
-                local distance = (playerPosition - otherPlayerPosition).Magnitude
-
-                if distance <= closestDistance then
-                    closestDistance = distance
-                    closestPlayer = otherPlayer
-                end
-            end
-        end
-
-        if closestPlayer and tick() - lastSlapTime >= slapCooldown then
-            lastSlapTime = tick()
-            if closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
-                local head = closestPlayer.Character.Head
-                local args = {head}
-                local remote = ReplicatedStorage:FindFirstChild(selectedRemote)
-                if remote then
-                    remote:FireServer(unpack(args))
-                else
-                    warn("Remote not found:", selectedRemote)
-                end
-            end
-        end
-    end
-end
+local selectedRemoteDropdown
 
 local gloveList = {
     {"Default", "b"},
@@ -177,10 +139,10 @@ for _, glove in ipairs(gloveList) do
     table.insert(gloveNames, glove[1])
 end
 
-SlapAuraTab:CreateDropdown({
+selectedRemoteDropdown = SlapAuraTab:CreateDropdown({
     Name = "Select Glove",
     Options = gloveNames,
-    CurrentOption = "Plague",
+    CurrentOption = {"Default"},
     MultipleOptions = false,
     Flag = "GloveDropdown",
     Callback = function(selectedOption)
@@ -193,6 +155,49 @@ SlapAuraTab:CreateDropdown({
         end
     end
 })
+
+-- Function to slap the closest player
+local function slapClosestPlayer()
+    if not slapEnabled then return end
+
+    local closestPlayer = nil
+    local closestDistance = 100  -- Default slap distance
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local playerPosition = player.Character.HumanoidRootPart.Position
+        for _, otherPlayer in pairs(Players:GetPlayers()) do
+            if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local otherPlayerPosition = otherPlayer.Character.HumanoidRootPart.Position
+                local distance = (playerPosition - otherPlayerPosition).Magnitude
+                if distance <= closestDistance then
+                    closestDistance = distance
+                    closestPlayer = otherPlayer
+                end
+            end
+        end
+
+        if closestPlayer and tick() - lastSlapTime >= slapCooldown then
+            lastSlapTime = tick()
+            local selectedOption = selectedRemoteDropdown.CurrentOption[1] or "Default"
+            for _, glove in ipairs(gloveList) do
+                if glove[1] == selectedOption then
+                    selectedRemote = glove[2]
+                end
+            end
+            if selectedRemote and closestPlayer.Character and closestPlayer.Character:FindFirstChild("Head") then
+                local head = closestPlayer.Character.Head
+                local remote = ReplicatedStorage:FindFirstChild(selectedRemote)
+                if remote then
+                    remote:FireServer(head)
+                    print("Fired remote:", selectedRemote)
+                else
+                    warn("Remote not found:", selectedRemote)
+                end
+            else
+                warn("Select a glove from the dropdown.")
+            end
+        end
+    end
+end
 
 SlapAuraTab:CreateToggle({
     Name = "Enable Slap Aura",
@@ -219,6 +224,7 @@ RunService.RenderStepped:Connect(function()
         slapClosestPlayer()
     end
 end)
+
 
 local SlappleFarmTab = Window:CreateTab("Slapple Farm", 4483362458)
 
@@ -931,6 +937,7 @@ uieditorTab:CreateInput({
 
 local ChangesTab = Window:CreateTab("Change Logs", 4483362458)
 
+ChangesTab:CreateSection("11/2/24: fixed slap aura, now works for rayfield!!")
 ChangesTab:CreateSection("11/2/24: removed all halloween stuff :(")
 ChangesTab:CreateSection("10/30/24: added a slapple serverhop farm (put in autoexecute!)")
 ChangesTab:CreateSection("10/30/24: unpatched candycorn farm")
