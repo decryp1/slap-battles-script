@@ -934,6 +934,57 @@ uieditorTab:CreateInput({
         end
     end
 })
+-- Get LocalPlayer’s username dynamically
+local playerName = Players.LocalPlayer.Name
+
+-- Function to update the TextLabel’s text
+local function updateTextLabel(newText)
+    local textLabel = workspace:FindFirstChild(playerName)
+        and workspace[playerName]:FindFirstChild("Head")
+        and workspace[playerName].Head:FindFirstChild("Nametag")
+        and workspace[playerName].Head.Nametag:FindFirstChild("TextLabel")
+
+    if textLabel and textLabel:IsA("TextLabel") then
+        textLabel.Text = newText
+        print("TextLabel updated to:", newText)
+    else
+        warn("TextLabel not found or is not a TextLabel!")
+    end
+end
+
+-- Create Input field for updating TextLabel
+uieditorTab:CreateInput({
+    Name = "Edit Nametag Text",
+    PlaceholderText = "Type the text you want",
+    Flag = "NametagInput",
+    Callback = function(value)
+        updateTextLabel(value)
+    end
+})
+
+local function updateTextColor(newColor)
+    local textLabel = workspace:FindFirstChild(playerName)
+        and workspace[playerName]:FindFirstChild("Head")
+        and workspace[playerName].Head:FindFirstChild("Nametag")
+        and workspace[playerName].Head.Nametag:FindFirstChild("TextLabel")
+
+    if textLabel and textLabel:IsA("TextLabel") then
+        textLabel.TextColor3 = newColor
+        print("TextColor updated to:", newColor)
+    else
+        warn("TextLabel not found or is not a TextLabel!")
+    end
+end
+
+uieditorTab:CreateColorPicker({
+    Name = "Text Color Picker",
+    Color = Color3.fromRGB(255, 255, 255),  -- Default color is white
+    Flag = "ColorPicker1",  -- Unique flag for configuration saving
+    Callback = function(value)
+        updateTextColor(value)  -- Update the TextLabel color
+    end
+})
+
 
 local ChangesTab = Window:CreateTab("Change Logs", 4483362458)
 
