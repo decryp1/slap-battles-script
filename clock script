@@ -1,0 +1,221 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Script by @decryp1 on YouTube",
+    LoadingTitle = "Loading Script...",
+    LoadingSubtitle = "Created by @decryp1",
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = nil,
+        FileName = "ClockBadgeUI"
+    }
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local RunService = game:GetService("RunService")
+local Toggle = false
+local HeartbeatConnection
+
+local function startTeleportLoop()
+    HeartbeatConnection = RunService.Heartbeat:Connect(function()
+        if Toggle and workspace:FindFirstChild("ClockBadgeTeleport") then
+            Character:SetPrimaryPartCFrame(workspace.ClockBadgeTeleport.CFrame - Vector3.new(0, 7, 0))
+        end
+    end)
+end
+
+local function stopTeleportLoop()
+    if HeartbeatConnection then
+        HeartbeatConnection:Disconnect()
+        HeartbeatConnection = nil
+    end
+end
+
+local function teleportAboveNoteThenToKeyPad()
+    if workspace:FindFirstChild("Note") then
+        Character:SetPrimaryPartCFrame(workspace.Note.CFrame + Vector3.new(0, 5, 0))
+        local clickDetector = workspace.Note:FindFirstChildOfClass("ClickDetector")
+        if clickDetector then
+            fireclickdetector(clickDetector)
+        else
+            warn("ClickDetector not found in Note.")
+        end
+        task.wait(5)
+        local keyPad = workspace:FindFirstChild("Key Pad")
+        if keyPad then
+             local player = game.Players.LocalPlayer.Character
+local part = game.Workspace["Key Pad"] 
+player.HumanoidRootPart.CFrame = part.CFrame
+        else
+            warn("Key Pad not found in workspace.")
+        end
+    else
+        warn("Note not found in workspace.")
+    end
+end
+
+local ProximityPromptPath = workspace:FindFirstChild("CellarBasement") and workspace.CellarBasement:FindFirstChild("Generator") and workspace.CellarBasement.Generator:FindFirstChild("ProximityPrompt")
+
+local function teleportAboveGenerator()
+    if workspace:FindFirstChild("CellarBasement") and workspace.CellarBasement:FindFirstChild("Generator") then
+        Character:SetPrimaryPartCFrame(workspace.CellarBasement.Generator.CFrame + Vector3.new(0, 5, 0))
+    else
+        warn("Generator not found at the specified path.")
+    end
+end
+
+local function holdProximityPrompt()
+    if ProximityPromptPath and ProximityPromptPath:IsA("ProximityPrompt") then
+        fireproximityprompt(ProximityPromptPath, 1)
+        task.wait(32)
+    else
+        warn("ProximityPrompt not found at the specified path.")
+    end
+end
+
+local function deleteLandmines()
+    local landminesFolder = workspace:FindFirstChild("Landmines")
+    if landminesFolder then
+        for _, landmine in pairs(landminesFolder:GetChildren()) do
+            if landmine:IsA("BasePart") or landmine:IsA("Model") then
+                landmine:Destroy()
+            end
+        end
+    else
+        warn("Landmines folder not found in workspace.")
+    end
+end
+
+local function grabPocketWatch()
+    local pocketWatch = workspace:FindFirstChild("PocketWatch")
+    if pocketWatch then
+        Character.HumanoidRootPart.CFrame = pocketWatch.CFrame.Value
+        local clickDetector = pocketWatch:FindFirstChildOfClass("ClickDetector")
+        if clickDetector then
+            fireclickdetector(clickDetector)
+        else
+            warn("ClickDetector not found in PocketWatch.")
+        end
+    else
+        warn("PocketWatch not found in workspace.")
+    end
+end
+
+local function highlightDrawersWithHandle()
+    local parentsDresser = workspace:FindFirstChild("Furniture") and workspace.Furniture:FindFirstChild("parentsDresser")
+    if parentsDresser then
+        for _, drawer in pairs(parentsDresser:GetChildren()) do
+            if drawer:IsA("Model") and drawer.Name == "Drawer" then
+                local handle = drawer:FindFirstChild("Handle")
+                if handle and handle:IsA("BasePart") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = drawer
+                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                    highlight.FillTransparency = 0.5
+                    highlight.OutlineTransparency = 0
+                end
+            end
+        end
+    else
+        warn("parentsDresser not found in workspace.Furniture.")
+    end
+end
+
+local function highlightBasketballsWithClickDetector()
+    local basketballsFolder = workspace:FindFirstChild("Furniture") and workspace.Furniture:FindFirstChild("jorgisBasketballs")
+    if basketballsFolder then
+        for _, basketball in pairs(basketballsFolder:GetChildren()) do
+            if basketball:IsA("BasePart") and basketball.Name == "B-Ball" then
+                local clickDetector = basketball:FindFirstChildOfClass("ClickDetector")
+                if clickDetector then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = basketball
+                    highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                    highlight.FillTransparency = 0.5
+                    highlight.OutlineTransparency = 0
+                end
+            end
+        end
+    else
+        warn("jorgisBasketballs not found in workspace.Furniture.")
+    end
+end
+
+local MainTab = Window:CreateTab("Main", 4483362458)
+local ExtraTab = Window:CreateTab("Extra", 4483362458)
+local CreditsTab = Window:CreateTab("Credits", 4483362458)
+
+MainTab:CreateButton({
+    Name = "Teleport to Brazil",
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.workspace.Lobby.Decoration.brazil.portal.CFrame
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Teleport to top of clock tower",
+    CurrentValue = false,
+    Callback = function(state)
+        Toggle = state
+        if Toggle then
+            startTeleportLoop()
+        else
+            stopTeleportLoop()
+        end
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Click Note",
+    Callback = function()
+        teleportAboveNoteThenToKeyPad()
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Start Generator",
+    Callback = function()
+        teleportAboveGenerator()
+        task.wait(1)
+        holdProximityPrompt()
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Delete All Landmines",
+    Callback = function()
+        deleteLandmines()
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Grab Pocketwatch",
+    Callback = function()
+        grabPocketWatch()
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Show Correct Drawer",
+    Callback = function()
+        highlightDrawersWithHandle()
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Show Correct Basketball",
+    Callback = function()
+        highlightBasketballsWithClickDetector()
+    end
+})
+
+ExtraTab:CreateButton({
+    Name = "Infinite Yield (admin commands)",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end
+})
+
+CreditsTab:CreateSection("Script by @decryp1 on YouTube")
