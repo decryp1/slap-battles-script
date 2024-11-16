@@ -1,1 +1,0 @@
-loadstring(game:HttpGet('https://raw.githubusercontent.com/decryp1/slap-battles-script/refs/heads/main/Slap%20Battles%20Script'))()
