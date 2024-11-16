@@ -1,0 +1,70 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "Script by @decryp1 on YouTube",
+    LoadingTitle = "Loading Script...",
+    LoadingSubtitle = "Created by @decryp1",
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = nil,
+        FileName = "untitledscriptUI"
+    }
+})
+
+local MainTab = Window:CreateTab("Main", 4483362458)
+local ExtraTab = Window:CreateTab("Extra", 4483362458)
+local CreditsTab = Window:CreateTab("Credits", 4483362458)
+
+MainTab:CreateButton({
+    Name = "Teleport to Brazil",
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.workspace.Lobby.Decoration.brazil.portal.CFrame
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Teleport to Real Event Area",
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(
+            -250.693451, 299.557343, -508.759155, 
+            0.903133392, -6.96500679e-09, -0.429360121, 
+            3.91057542e-09, 1, -7.99616817e-09, 
+            0.429360121, 5.54256108e-09, 0.903133392
+        )
+        for _, sign in ipairs(workspace.Signs:GetDescendants()) do
+            if sign:IsA("ClickDetector") then
+                fireclickdetector(sign)
+            end
+        end
+    end
+})
+
+MainTab:CreateButton({
+    Name = "Finish Obby",
+    Callback = function()
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(
+            0.401012123, 190.440491, 19.2366982, 
+            0.99982208, 0.00969686918, -0.0161778964, 
+            0, 0.857723653, 0.514110982, 
+            0.0188614316, -0.514019489, 0.857571065
+        )
+    end
+})
+
+
+
+ExtraTab:CreateButton({
+    Name = "Infinite Yield (admin commands)",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end
+})
+
+ExtraTab:CreateButton({
+    Name = "sacrifice",
+    Callback = function()
+        game.ReplicatedStorage.Sacrifice:FireServer()
+    end
+})
+
+CreditsTab:CreateSection("Script by @decryp1 on YouTube")
