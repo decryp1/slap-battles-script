@@ -1,0 +1,51 @@
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+local targetPlaceId = 7234087065
+local firstCFrame = CFrame.new(
+    15.9875946, 55.9212723, 7.62149334, 
+    -0.86232847, -0.00176047441, 0.506346226, 
+    -1.19723736e-05, 0.99999404, 0.00345640932, 
+    -0.506349266, 0.00297449832, -0.862323344
+)
+
+local function teleportTo(cframe)
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        character.HumanoidRootPart.CFrame = cframe
+    end
+end
+
+local function interactWithClickDetector(part)
+    local clickDetector = part:FindFirstChild("ClickDetector")
+    if clickDetector then
+        fireclickdetector(clickDetector)
+    else
+        warn("ClickDetector not found in part:", part.Name)
+    end
+end
+
+local function executeActions()
+    print("s")
+    task.wait(10)
+
+    teleportTo(firstCFrame)
+    task.wait(5)
+
+    local BoxingGloves = Workspace:FindFirstChild("BoxingGloves")
+    if BoxingGloves then
+        teleportTo(BoxingGloves.CFrame)
+        task.wait(1)
+        interactWithClickDetector(BoxingGloves)
+    else
+        warn("q")
+    end
+end
+
+if TeleportService:GetLocalPlayerTeleportData() then
+    executeActions()
+else
+    TeleportService:Teleport(targetPlaceId, LocalPlayer, {})
+end
