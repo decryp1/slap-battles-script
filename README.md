@@ -1,3 +1,2 @@
-this is the Slap Battles version of Herkle Hub. Herkle hub private is the only one that i am updating, the free version is still the best one though, it's on par with forge and giang. private, however, has features nobody else has: Player Stat Tracker (can find other people twitter usernames, read null shards, redeemed twitter codes, etc.), two different anti ragdolls, 2 different godmodes, working custom slap aura, fe animations from every glove, and free gamepasses like titan, radio, and emotes, telekinesis that can make unanchored objects fly, like lego's from the brick glove, and more. also, herkle Hub Private has 5 built in slap farms, including the el gato farm that i made. it gets anywhere from 1000- 1500 slaos every 20 seconds. all for free!
-
-my youtube to find more of my scripts:  https://www.youtube.com/@decryp1
+pretty okay slap battles script
+dsc.gg/decryp
