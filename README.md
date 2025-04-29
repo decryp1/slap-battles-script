@@ -1,2 +1,2 @@
 pretty okay slap battles script
-dsc.gg/decryp
+dsc.gg/herkle
